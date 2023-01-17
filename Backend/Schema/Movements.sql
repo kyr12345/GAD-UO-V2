@@ -8,7 +8,6 @@ CREATE TABLE `movements` (
   `User` varchar(255) NOT NULL,
   `date_time` date NOT NULL,
   `CONFIRMATION` varchar(50) default "NO",
-  `SUBMISSION` DATE DEFAULT NULL,
   PRIMARY KEY (`MID`),
   FOREIGN KEY (`FID`) REFERENCES `filetables` (`FID`)
 )

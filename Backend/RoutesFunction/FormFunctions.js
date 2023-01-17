@@ -492,49 +492,106 @@ exports.UpdateForm = async (req, res) => {
 }
 
 exports.Movement = async (req, res) => {
-  const FindFromFileQuery = `SELECT*FROM MOVEMENTS WHERE UO=?`
-  const year = req.params.year
-  const numbers = req.params.number
+  const { search, state } = req.body
+  console.log(state)
+  console.log(search)
   const response = []
-  const uo = `${numbers}/${year}`
-  const EntryFromMovement = await connection.query(FindFromFileQuery, [uo])
 
-  if (EntryFromMovement[0].length > 0) {
+  const FindOnUO = `SELECT*FROM MOVEMENTS WHERE UO=?`
+
+  if (state === '1') {
+    const EntryFromMovement = await connection.query(FindOnUO, [search])
     const entryfromFiletables = await connection.query(
-      `SELECT*FROM FILETABLES WHERE FID=${EntryFromMovement[0][0].FID}`,
+      `SELECT*FROM FILETABLES WHERE UO=?`,
+      [search],
     )
-    for (let i = 0; i < EntryFromMovement[0].length; i++) {
-      const answer = {
-        MID: EntryFromMovement[0][i].MID,
-        FID: EntryFromMovement[0][i].FID,
-        UO: EntryFromMovement[0][i].UO,
-        MOVTO: EntryFromMovement[0][i].MOVTO,
-        MOVTDATE: EntryFromMovement[0][i].MOVTDATE + 1,
-        Remarks: EntryFromMovement[0][i].Remarks,
-        User: EntryFromMovement[0][i].User,
-        date_time: EntryFromMovement[0][i].date_time + 1,
-      }
-      response.push(answer)
-    }
 
-    res.status(200).json({
-      success: true,
-      msg: 'Movement Found',
-      Movement: response,
-      File: entryfromFiletables[0][0],
-    })
+    if (EntryFromMovement[0].length > 0) {
+      for (let i = 0; i < EntryFromMovement[0].length; i++) {
+        const answer = {
+          MID: EntryFromMovement[0][i].MID,
+          FID: EntryFromMovement[0][i].FID,
+          UO: EntryFromMovement[0][i].UO,
+          MOVTO: EntryFromMovement[0][i].MOVTO,
+          MOVTDATE: EntryFromMovement[0][i].MOVTDATE + 1,
+          Remarks: EntryFromMovement[0][i].Remarks,
+          User: EntryFromMovement[0][i].User,
+          date_time: EntryFromMovement[0][i].date_time + 1,
+        }
+        response.push(answer)
+      }
+
+      res.status(200).json({
+        success: true,
+        msg: 'Movement Found',
+        Movement: response,
+        File: entryfromFiletables[0][0],
+      })
+    } else {
+      res.status(200).json({
+        success: false,
+        msg: 'Movement For This UO do not Exists ',
+      })
+    }
   } else {
-    res.status(200).json({
-      success: false,
-      msg: 'Movement For This UO do not Exists ',
-    })
+    const FindFromFileQuery = `SELECT*FROM FILETABLES  WHERE (eSarkar REGEXP "${search}") `
+    const data = await connection.query(FindFromFileQuery)
+    console.log(data[0])
+    if (data[0].length > 1) {
+      res.status(200).json({
+        success: false,
+        msg: 'Enter Full eSarkarno',
+      })
+    } else if (data[0].length === 0) {
+      res.status(200).json({
+        success: false,
+        msg: 'File With Such eSarkarno Does Not Exists',
+      })
+    } else {
+      const EntryFromMovement = await connection.query(FindOnUO, [
+        data[0][0].UO,
+      ])
+      const entryfromFiletables = await connection.query(
+        `SELECT*FROM FILETABLES WHERE UO=?`,
+        [data[0][0].UO],
+      )
+      console.log(entryfromFiletables[0])
+
+      if (EntryFromMovement[0].length > 0) {
+        for (let i = 0; i < EntryFromMovement[0].length; i++) {
+          const answer = {
+            MID: EntryFromMovement[0][i].MID,
+            FID: EntryFromMovement[0][i].FID,
+            UO: EntryFromMovement[0][i].UO,
+            MOVTO: EntryFromMovement[0][i].MOVTO,
+            MOVTDATE: EntryFromMovement[0][i].MOVTDATE + 1,
+            Remarks: EntryFromMovement[0][i].Remarks,
+            User: EntryFromMovement[0][i].User,
+            date_time: EntryFromMovement[0][i].date_time + 1,
+          }
+          response.push(answer)
+        }
+
+        res.status(200).json({
+          success: true,
+          msg: 'Movement Found',
+          Movement: response,
+          File: entryfromFiletables[0][0],
+        })
+      } else {
+        res.status(200).json({
+          success: false,
+          msg: 'Movement For This UO do not Exists ',
+        })
+      }
+    }
   }
 }
 
 exports.NewMovement = async (req, res) => {
   const date = new Date()
   const QueryForMovement = `INSERT INTO MOVEMENTS (FID,UO,MOVTO,MOVTDATE,REMARKS,User,DATE_TIME) VALUES (?,?,?,?,?,?,?)`
-  const UpdateQuery = `UPDATE movements set confirmation=? , SUBMISSION=? WHERE UO=? AND MOVTO=?`
+  const UpdateQuery = `UPDATE movements set confirmation=?  WHERE UO=? AND MOVTO=?`
   const {
     UO,
     newmovement,
@@ -557,7 +614,7 @@ exports.NewMovement = async (req, res) => {
   if (result[0].insertId) {
     const previousEntryCompletion = await connection.query(UpdateQuery, [
       'YES',
-      date,
+
       UO,
       designation,
     ])
@@ -862,9 +919,9 @@ exports.GetWorkSheetOnDesignation = async (req, res) => {
           deadline: datas[0][0].DEADLINE,
           status: data[0][i].CONFIRMATION,
           submission_date:
-            data[0][i].SUBMISSION === null
+            data[0][i].CONFIRMATION === 'NO'
               ? 'Pending'
-              : data[0][i].SUBMISSION + 1,
+              : data[0][i].MOVTDATE + 1,
         })
       }
       accused = []

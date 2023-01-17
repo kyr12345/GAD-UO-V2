@@ -14,6 +14,7 @@ function Movements() {
   const UONUMBER = window.localStorage.getItem('UO')
 
   const [UO, SETUO] = useState('')
+  const [esarkarno, setesarkarno] = useState('')
   const [showold, setshowold] = useState(false)
   const [showmovement, setmovement] = useState(false)
   const [shownewmovement, setnewmovement] = useState(false)
@@ -25,7 +26,7 @@ function Movements() {
   const [remarks, setremarks] = useState('')
   const [FileEntry, setFileEntry] = useState({})
   const [user, setuser] = useState('')
-  const request = `http://${ipfile.ip}:3000/api/v1/movement/${UO}`
+  const request = `http://${ipfile.ip}:3000/api/v1/movement`
 
   useEffect(() => {
     if (result) {
@@ -44,15 +45,15 @@ function Movements() {
 
   const handleMovement = async (event) => {
     event.preventDefault()
-const MovementEntryLength=MovementEntry.length;
+    const MovementEntryLength = MovementEntry.length
     const inputs = {
-      UO,
+      UO: UO.length > 0 ? UO : FileEntry.UO,
       newmovement,
       newmovementdate,
       remarks,
       fileid: FileEntry.FID,
       user,
-      designation:MovementEntry[MovementEntryLength-1].MOVTO
+      designation: MovementEntry[MovementEntryLength - 1].MOVTO,
     }
     let err = ''
     if (newmovement.length === 0) {
@@ -89,20 +90,39 @@ const MovementEntryLength=MovementEntry.length;
 
   const handleMovementTable = async (event) => {
     event.preventDefault()
-    const result = await axios.get(request, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-      },
-    })
-
-    console.log(result)
-    if (!result.data.success) {
-      setmovement(false)
-      alert(result.data.msg)
+    let input = {}
+    let err = ''
+    if (esarkarno.length === 0) {
+      input = {
+        search: UO,
+        state: 1,
+      }
+    } else if (esarkarno.length > 0 && UO.length > 0) {
+      err += 'Enter Only In One Field'
     } else {
-      setMovementEntry(result.data.Movement)
-      setFileEntry(result.data.File)
-      setmovement(true)
+      input = {
+        search: esarkarno,
+        state: 2,
+      }
+    }
+
+    if (err.length === 0) {
+      const result = await axios.post(request, input, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        },
+      })
+      console.log(result)
+      if (!result.data.success) {
+        setmovement(false)
+        alert(result.data.msg)
+      } else {
+        setMovementEntry(result.data.Movement)
+        setFileEntry(result.data.File)
+        setmovement(true)
+      }
+    } else {
+      alert(err)
     }
   }
 
@@ -115,9 +135,10 @@ const MovementEntryLength=MovementEntry.length;
       <h1 className="text-center font-bold text-2xl mt-16">MOVEMENTS</h1>
       <form onSubmit={handleMovementTable} method="GET">
         <div className="flex flex-col px-8 py-8 align-items-center justify-center">
-          <h4 className="font-bold">Enter The UO Number:</h4>
+          <h4 className="font-bold">Enter UO Number:</h4>
           <TextField
             onChange={(e) => {
+              setesarkarno('')
               SETUO(e.target.value)
               setmovement(false)
               setnewmovement(false)
@@ -125,7 +146,23 @@ const MovementEntryLength=MovementEntry.length;
             value={UO}
             required
             className="w-full bg-white border-2 "
-            placeholder="Enter The UO Number"
+            placeholder="Enter  UO Number"
+          />
+        </div>
+        <h2 className="text-center font-bold">OR</h2>
+        <div className="flex flex-col px-8 py-8 align-items-center justify-center">
+          <h4 className="font-bold">Enter eSarkarno Number:</h4>
+          <TextField
+            onChange={(e) => {
+              setesarkarno(e.target.value)
+              SETUO('')
+              setmovement(false)
+              setnewmovement(false)
+            }}
+            value={esarkarno}
+            required
+            className="w-full bg-white border-2 "
+            placeholder="Enter  eSarkarno Number"
           />
         </div>
         <div className="flex justify-center mt-4">
@@ -144,7 +181,9 @@ const MovementEntryLength=MovementEntry.length;
       {showmovement && (
         <Old
           show={false}
-          uonumber={UO}
+          uonumber={
+            UO.length > 0 ? UO : FileEntry.UO.length > 0 ? FileEntry.UO : ''
+          }
           secondbtn={false}
           heading="View Inward"
           showAccused={false}

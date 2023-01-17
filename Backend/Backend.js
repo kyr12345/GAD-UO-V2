@@ -33,8 +33,7 @@ const connection = mysql.createConnection({
   host: ipfile.host,
   user: 'root',
   password: 'S2k3c0s2@1110',
-  database: 'uo',  
-  
+  database: 'uo',
 })
 
 //ROUTES
@@ -44,8 +43,12 @@ app.use('/api/v1', Form)
 
 //SERVER START
 
+connection.query('SET GLOBAL connect_timeout=280000000')
+
 connection.connect((err, result) => {
-  if (err) console.log(err)
+  if (err) {
+    console.log(err)
+  }
 
   console.log('Database Connected')
 })
