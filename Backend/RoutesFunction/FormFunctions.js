@@ -1,7 +1,8 @@
 const mysql = require('mysql2')
+const ipfile = require('../../Frontend/src/ip.json')
 const connection = mysql
   .createConnection({
-    host: 'localhost',
+    host: ipfile.host,
     user: 'root',
     password: 'S2k3c0s2@1110',
     database: 'uo',
@@ -13,10 +14,12 @@ const CheckAccusedEntry = `SELECT*FROM ACCUSED WHERE SATHI=?`
 const Accused_Designation_Entry = `INSERT INTO ACCUSED_DESIGNATION (DESIGNATION,USER,FID,AID,CLASS,CUC,DATE_TIME) VALUES (?,?,?,?,?,?,?)`
 const Movement_Entry = `INSERT INTO movements (FID,UO,MOVTO,MOVTDATE,REMARKS,USER,DATE_TIME) VALUES (?,?,?,?,?,?,?)`
 
+/* get latest allocation */
+
 exports.GetLatestAllocation = async (req, res) => {
   const Query = `select*from allocation  ORDER BY COUNT ;`
   const response = await connection.query(Query)
-  console.log(response[0])
+
   const AllocationPersons = ['US-1', 'US-2', 'SO-2', 'SO-3', 'DYSO-1', 'DYSO-4']
 
   const AllocationList = response[0]
@@ -30,7 +33,7 @@ exports.GetLatestAllocation = async (req, res) => {
       AllocationList.push({ ALLOCATED: AllocationPersons[i], COUNT: 0 })
     }
   }
-  console.log(AllocationList)
+
   /* Deleted New One */
 
   for (let i = 0; i < AllocationList.length; i++) {
@@ -38,8 +41,6 @@ exports.GetLatestAllocation = async (req, res) => {
       AllocationList.splice(i, 1)
     }
   }
-
-  console.log(AllocationList)
 
   res.status(200).json({
     success: true,
@@ -92,7 +93,6 @@ exports.NewCaseForm = async (req, res) => {
     let dt = new Date()
     const newDate = new Date(dt.setFullYear(9999))
     date = newDate
-    console.log(date)
   }
 
   let insertid
@@ -252,7 +252,7 @@ exports.OldForm = async (req, res) => {
 
     const AccusedEntry = await connection.query(query, [FID])
     const AccusedDetails = AccusedEntry[0]
-    console.log(AccusedDetails)
+
     const Alldata = {}
     if (AccusedDetails.length > 0) {
       Alldata.FileDetails = FileEntryDetails
@@ -307,7 +307,7 @@ exports.UpdateForm = async (req, res) => {
     const newDate = new Date(dt.setFullYear(dt.getFullYear() + 100))
     date = newDate
   }
-  console.log(fields)
+
   let insertid
   let accusedEntry
   let accused_designation_Entry
@@ -325,17 +325,15 @@ exports.UpdateForm = async (req, res) => {
     date,
     Attachment,
   ])
-  console.log(fields)
+
   if (InsertResult[0].insertId) {
     /* FID */
     insertid = InsertResult[0].insertId
-    console.log(insertid)
+
     if (fields.length > 0) {
       fields.map(async (accused) => {
         if (accused.Consideration === 'false') accused.Consideration = 'No'
         else accused.Consideration = 'Yes'
-
-        console.log(accused.Consideration)
 
         if (accused.AID >= '0' && accused.SATHI.length > 0) {
           /* UPDATE AND SET THE AID AND SATHI */
@@ -365,7 +363,6 @@ exports.UpdateForm = async (req, res) => {
           const executed = await connection.query(PresenceOfAccused, [
             accused.SATHI,
           ])
-          console.log('Third')
 
           if (executed[0].length === 0) {
             const AccusedEntry = `INSERT INTO ACCUSED (SATHI,NAME,DOR,USER,DATE_TIME) VALUES (?,?,?,?,?)`
@@ -377,7 +374,6 @@ exports.UpdateForm = async (req, res) => {
               user,
               dates,
             ])
-            console.log('Third->first')
 
             const excusedDesignationEntry = `INSERT INTO ACCUSED_DESIGNATION (DESIGNATION,USER,FID,AID,DATE_TIME,CLASS,CUC) VALUES(?,?,?,?,?,?,?)`
 
@@ -426,7 +422,6 @@ exports.UpdateForm = async (req, res) => {
             ],
           )
         } else {
-          console.log('Last Else')
           /* if sathi is not provided */
           const EntryAccused = `INSERT INTO ACCUSED (SATHI,NAME,DOR,USER,DATE_TIME) VALUES (?,?,?,?,?)`
           const executed = await connection.query(EntryAccused, [
@@ -539,7 +534,16 @@ exports.Movement = async (req, res) => {
 exports.NewMovement = async (req, res) => {
   const date = new Date()
   const QueryForMovement = `INSERT INTO MOVEMENTS (FID,UO,MOVTO,MOVTDATE,REMARKS,User,DATE_TIME) VALUES (?,?,?,?,?,?,?)`
-  const { UO, newmovement, newmovementdate, remarks, fileid, user } = req.body
+  const UpdateQuery = `UPDATE movements set confirmation=? , SUBMISSION=? WHERE UO=? AND MOVTO=?`
+  const {
+    UO,
+    newmovement,
+    newmovementdate,
+    remarks,
+    fileid,
+    user,
+    designation,
+  } = req.body
   const result = await connection.query(QueryForMovement, [
     fileid,
     UO,
@@ -549,11 +553,17 @@ exports.NewMovement = async (req, res) => {
     user,
     date,
   ])
-  console.log(result)
+
   if (result[0].insertId) {
+    const previousEntryCompletion = await connection.query(UpdateQuery, [
+      'YES',
+      date,
+      UO,
+      designation,
+    ])
+
     res.status(200).json({
       success: true,
-
       msg: 'Movement Added',
     })
   }
@@ -561,55 +571,6 @@ exports.NewMovement = async (req, res) => {
 
 exports.Cases = async (req, res) => {
   const { value, department } = req.body
-
-  /*   if (value.indexOf('/') <= -1) {
-    const MovementAndFileResponse = []
-
-    const QuerySearchWithRegex = `SELECT*FROM FILETABLES WHERE UO=?`
-
-    const response = await connection.query(QuerySearchWithRegex, [value])
-
-    if (response[0].length > 0) {
-      response[0][0].DATE_TIME = response[0][0].DATE_TIME + 1
-
-      const FileQuery = `SELECT*FROM MOVEMENTS WHERE FID=?`
-      const AccusedQuery = `SELECT*FROM ACCUSED_DESIGNATION INNER JOIN ACCUSED ON ACCUSED_DESIGNATION.AID=ACCUSED.AID WHERE ACCUSED_DESIGNATION.FID=?`
-      const responseMovement = await connection.query(FileQuery, [
-        response[0][0].FID,
-      ])
-      const responseAccused = await connection.query(AccusedQuery, [
-        response[0][0].FID,
-      ])
-      for (let i = 0; i < responseMovement[0].length; i++) {
-        responseMovement[0][i].MOVTDATE = responseMovement[0][i].MOVTDATE + 1
-        responseMovement[0][i].date_time = responseMovement[0][i].date_time + 1
-      }
-
-      MovementAndFileResponse.push({
-        FileDetails: response[0][0],
-        Movement: responseMovement[0],
-        Accused: responseAccused[0],
-      })
-
-      if (MovementAndFileResponse.length > 0) {
-        res.status(200).json({
-          success: true,
-          msg: MovementAndFileResponse,
-        })
-      } else {
-        res.status(200).json({
-          success: false,
-          msg: 'No Data Found',
-        })
-      }
-    } else {
-      res.status(200).json({
-        success: false,
-        msg: 'Case Does Not With this UO',
-      })
-    }
-  } else {
-  } */
 
   const MovementAndFileResponse = []
   let QuerySearchWithRegex
@@ -625,13 +586,12 @@ exports.Cases = async (req, res) => {
     (value, index, self) =>
       index === self.findIndex((t) => t.FID === value.FID),
   )
-  console.log(response[0])
 
   for (let i = 0; i < response[0].length; i++) {
     response[0][i].DATE_TIME = response[0][i].DATE_TIME + 1
     response[0][i].DEADLINE = response[0][i].DEADLINE + 1
   }
-  console.log(response[0])
+
   for (let i = 0; i < response[0].length; i++) {
     const FileQuery = `SELECT*FROM MOVEMENTS WHERE FID=?`
     const AccusedQuery = `SELECT*FROM ACCUSED_DESIGNATION INNER JOIN ACCUSED ON ACCUSED_DESIGNATION.AID=ACCUSED.AID WHERE ACCUSED_DESIGNATION.FID=?`
@@ -674,13 +634,12 @@ exports.DateSearch = async (req, res) => {
   const QuerySearchWithDate = `SELECT*FROM MOVEMENTS WHERE MOVEMENTS.MOVTDATE>="${from}" and MOVEMENTS.MOVTDATE<="${to}" order BY FID`
 
   const response = await connection.query(QuerySearchWithDate)
-  console.log(response[0])
+
   const MovementAndFileResponse = []
   for (let i = 0; i < response[0].length; i++) {
     response[0][i].date_time = response[0][i].date_time + 1
     response[0][i].MOVTDATE = response[0][i].MOVTDATE + 1
   }
-  console.log('------------------------------')
 
   const FileDetails = []
 
@@ -704,9 +663,6 @@ exports.DateSearch = async (req, res) => {
       FileDetailsonMovemet[0][0].DEADLINE + 1
     FileDetails.push(FileDetailsonMovemet[0][0])
 
-    console.log('------------------------------')
-    console.log(FileDetailsonMovemet[0][0])
-
     /* ACCUSED */
 
     const responseAccused = await connection.query(AccusedQuery, [
@@ -725,17 +681,11 @@ exports.DateSearch = async (req, res) => {
       MovementsFromTable[0][i].MOVTDATE = MovementsFromTable[0][i].MOVTDATE + 1
     }
 
-    console.log('------------------------------')
-    console.log(responseAccused[0])
-
     MovementAndFileResponse.push({
       FileDetails: FileDetailsonMovemet[0][0],
       Movements: MovementsFromTable[0],
       Accused: responseAccused[0],
     })
-
-    console.log('------------------------------')
-    console.log(MovementAndFileResponse)
   }
 
   if (MovementAndFileResponse.length > 0) {
@@ -749,4 +699,192 @@ exports.DateSearch = async (req, res) => {
       msg: 'No Data Found',
     })
   }
+}
+
+exports.GetFileOnDesignation = async (req, res) => {
+  const eachFileMovements = []
+  const responseMovement = []
+  const deadlineFile = []
+  let CurrentMonthCaseAllocation = 0
+  let CurrentMonthCaseSubmitted = 0
+  let AllPending = 0
+  let PreviousMonthPending = 0
+  const designation = req.params.designation.toUpperCase()
+
+  const QueryForMovement = `SELECT*FROM MOVEMENTS WHERE (MOVTO=? AND CONFIRMATION="NO") `
+
+  const responseMovements = await connection.query(QueryForMovement, [
+    designation,
+  ])
+
+  /* ------------------ */
+
+  //CurrentMonth Case Allocation and Submission
+
+  let date = new Date()
+  let firstDayCurrentMonth = new Date(date.getFullYear(), date.getMonth(), 1)
+
+  let lastDayCurrentMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+
+  let prevMonthLastDate = new Date(date.getFullYear(), date.getMonth(), 0)
+  let prevMonthFirstDate = new Date(
+    date.getFullYear() - (date.getMonth() > 0 ? 0 : 1),
+    (date.getMonth() - 1 + 12) % 12,
+    1,
+  )
+  /* AND CONFIRMATION="NO" */
+  const QueryForCurrentMonthCasesAllocated = `SELECT * FROM MOVEMENTS  WHERE MOVTO=?  AND MOVTDATE>=? AND MOVTDATE<=?`
+  const QueryForCurrentMonthCasesSubmitted = `SELECT * FROM MOVEMENTS  WHERE MOVTO=? AND CONFIRMATION="YES" AND MOVTDATE>=? AND MOVTDATE<=?`
+
+  const QueryForAllPendingCases = `SELECT * FROM MOVEMENTS  WHERE MOVTO=? AND CONFIRMATION="NO"`
+
+  const QueryForAllPreviousMonthPendingCases = `SELECT * FROM MOVEMENTS  WHERE MOVTO=? AND CONFIRMATION="NO" AND MOVTDATE>=? AND MOVTDATE<=?`
+
+  const valueofCurrentMonthAllocation = await connection.query(
+    QueryForCurrentMonthCasesAllocated,
+    [designation, firstDayCurrentMonth, lastDayCurrentMonth],
+  )
+  const valueofCurrentMonthSubmitted = await connection.query(
+    QueryForCurrentMonthCasesSubmitted,
+    [designation, firstDayCurrentMonth, lastDayCurrentMonth],
+  )
+  const valueofAllPending = await connection.query(QueryForAllPendingCases, [
+    designation,
+  ])
+
+  const valueofPreviousMonthPending = await connection.query(
+    QueryForAllPreviousMonthPendingCases,
+    [designation, prevMonthFirstDate, prevMonthLastDate],
+  )
+
+  CurrentMonthCaseAllocation = valueofCurrentMonthAllocation[0].length
+  CurrentMonthCaseSubmitted = valueofCurrentMonthSubmitted[0].length
+  AllPending = valueofAllPending[0].length
+  PreviousMonthPending = valueofPreviousMonthPending[0].length
+  /* ------------------ */
+
+  /* All files */
+
+  /*   if (responseMovements[0].length !== 0) {
+
+    
+   
+    for (let i = 0; i < responseMovements[0].length; i++) {
+      const data = await connection.query(QueryForMovement, [responseMovements[0][i].FID])
+
+      if (data[0].length > 0) {
+        data[0][0].MOVTDATE = data[0][0].MOVTDATE + 1
+        data[0][0].date_time = data[0][0].date_time + 1
+        eachFileMovements.push(data[0][0])
+      }
+    }
+  }
+
+  if (eachFileMovements.length !== 0) {
+
+    for (let i = 0; i < eachFileMovements.length; i++) {
+      if (eachFileMovements[i].MOVTO == designation) {
+        responseMovement.push(eachFileMovements[i])
+      }
+    }
+  } */
+
+  /* details of each FILE MOVEMENT */
+  if (responseMovements[0].length > 0) {
+    const queryForData = `SELECT* FROM FILETABLES INNER JOIN ACCUSED_DESIGNATION INNER JOIN ACCUSED ON ACCUSED_DESIGNATION.AID=ACCUSED.AID ON FILETABLES.FID=ACCUSED_DESIGNATION.FID WHERE FILETABLES.UO=? `
+
+    let accused = []
+
+    for (let i = 0; i < responseMovements[0].length; i++) {
+      const data = await connection.query(queryForData, [
+        responseMovements[0][i].UO,
+      ])
+
+      for (let j = 0; j < data[0].length; j++) {
+        accused.push(data[0][j].NAME)
+      }
+      if (data[0].length > 0) {
+        deadlineFile.push({
+          uo: data[0][0].UO,
+          esarkarno: data[0][0].eSarkar,
+          department: data[0][0].Department,
+          fileno: data[0][0].fileno,
+          accused,
+          deadline: data[0][0].DEADLINE,
+        })
+      }
+      accused = []
+    }
+  }
+
+  deadlineFile.sort((a, b) => a.deadline - b.deadline)
+  for (let i = 0; i < deadlineFile.length; i++) {
+    deadlineFile[i].deadline = deadlineFile[i].deadline + 1
+  }
+
+  res.status(200).json({
+    response: deadlineFile,
+    AllocatedFiles: CurrentMonthCaseAllocation,
+    Submitted: CurrentMonthCaseSubmitted,
+    Pending: AllPending,
+    PreviousPending: PreviousMonthPending,
+  })
+}
+
+exports.GetWorkSheetOnDesignation = async (req, res) => {
+  const designation = req.params.designation
+
+  const Response = []
+  /* MOVEMENTS ON DESIGNATION */
+  const QueryForWorkSheet = `SELECT*FROM MOVEMENTS WHERE MOVTO=? ORDER BY CONFIRMATION `
+  const data = await connection.query(QueryForWorkSheet, [designation])
+  console.log(data[0])
+  /* details of each UO */
+  if (data[0].length > 0) {
+    const queryForData = `SELECT* FROM FILETABLES INNER JOIN ACCUSED_DESIGNATION INNER JOIN ACCUSED ON ACCUSED_DESIGNATION.AID=ACCUSED.AID ON FILETABLES.FID=ACCUSED_DESIGNATION.FID WHERE FILETABLES.UO=?`
+
+    let accused = []
+
+    for (let i = 0; i < data[0].length; i++) {
+      const datas = await connection.query(queryForData, [data[0][i].UO])
+
+      for (let j = 0; j < datas[0].length; j++) {
+        accused.push(datas[0][j].NAME)
+      }
+
+      if (datas[0].length > 0) {
+        Response.push({
+          uo: datas[0][0].UO,
+          esarkarno: datas[0][0].eSarkar,
+          department: datas[0][0].Department,
+          fileno: datas[0][0].fileno,
+          accused,
+          deadline: datas[0][0].DEADLINE,
+          status: data[0][i].CONFIRMATION,
+          submission_date:
+            data[0][i].SUBMISSION === null
+              ? 'Pending'
+              : data[0][i].SUBMISSION + 1,
+        })
+      }
+      accused = []
+    }
+    Response.sort((a, b) => a.deadline - b.deadline)
+    for (let i = 0; i < Response.length; i++) {
+      Response[i].deadline = Response[i].deadline + 1
+    }
+  }
+
+  res.status(200).json({
+    data: Response,
+  })
+}
+
+exports.UsersAllocation = async (req, res) => {
+  const QueryForUsers = `SELECT*FROM ALLOCATION`
+  const data = await connection.query(QueryForUsers)
+  console.log(data[0])
+  res.status(200).json({
+    data: data[0],
+  })
 }

@@ -11,6 +11,8 @@ import ipfile from '../../ip.json'
 function Movements() {
   /* const result = useSelector((state) => state.user.currentUser) */
   const result = JSON.parse(window.localStorage.getItem('ROLE_NAME'))
+  const UONUMBER = window.localStorage.getItem('UO')
+
   const [UO, SETUO] = useState('')
   const [showold, setshowold] = useState(false)
   const [showmovement, setmovement] = useState(false)
@@ -27,15 +29,22 @@ function Movements() {
 
   useEffect(() => {
     if (result) {
-      console.log(newmovementdate)
       setuser(result.username)
-      console.log(result)
+    }
+    if (UONUMBER.length > 0) {
+      SETUO(UONUMBER)
+
+      const handler = document.getElementById('buttonSubmit')
+      handler.click()
+      setTimeout(() => {
+        window.localStorage.setItem('UO', '')
+      }, 5000)
     }
   }, [result, newmovementdate])
 
   const handleMovement = async (event) => {
     event.preventDefault()
-
+const MovementEntryLength=MovementEntry.length;
     const inputs = {
       UO,
       newmovement,
@@ -43,6 +52,7 @@ function Movements() {
       remarks,
       fileid: FileEntry.FID,
       user,
+      designation:MovementEntry[MovementEntryLength-1].MOVTO
     }
     let err = ''
     if (newmovement.length === 0) {
@@ -124,6 +134,7 @@ function Movements() {
             variant="contained"
             sx={{ backgroundColor: 'blue', color: 'white' }}
             endIcon={<SendIcon />}
+            id="buttonSubmit"
           >
             Submit
           </Button>

@@ -1,0 +1,48 @@
+ /*   if (value.indexOf('/') <= -1) {
+    const MovementAndFileResponse = []
+
+    const QuerySearchWithRegex = `SELECT*FROM FILETABLES WHERE UO=?`
+
+    const response = await connection.query(QuerySearchWithRegex, [value])
+
+    if (response[0].length > 0) {
+      response[0][0].DATE_TIME = response[0][0].DATE_TIME + 1
+
+      const FileQuery = `SELECT*FROM MOVEMENTS WHERE FID=?`
+      const AccusedQuery = `SELECT*FROM ACCUSED_DESIGNATION INNER JOIN ACCUSED ON ACCUSED_DESIGNATION.AID=ACCUSED.AID WHERE ACCUSED_DESIGNATION.FID=?`
+      const responseMovement = await connection.query(FileQuery, [
+        response[0][0].FID,
+      ])
+      const responseAccused = await connection.query(AccusedQuery, [
+        response[0][0].FID,
+      ])
+      for (let i = 0; i < responseMovement[0].length; i++) {
+        responseMovement[0][i].MOVTDATE = responseMovement[0][i].MOVTDATE + 1
+        responseMovement[0][i].date_time = responseMovement[0][i].date_time + 1
+      }
+
+      MovementAndFileResponse.push({
+        FileDetails: response[0][0],
+        Movement: responseMovement[0],
+        Accused: responseAccused[0],
+      })
+
+      if (MovementAndFileResponse.length > 0) {
+        res.status(200).json({
+          success: true,
+          msg: MovementAndFileResponse,
+        })
+      } else {
+        res.status(200).json({
+          success: false,
+          msg: 'No Data Found',
+        })
+      }
+    } else {
+      res.status(200).json({
+        success: false,
+        msg: 'Case Does Not With this UO',
+      })
+    }
+  } else {
+  } */

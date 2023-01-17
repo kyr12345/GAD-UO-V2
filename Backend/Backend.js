@@ -10,6 +10,7 @@ const app = require('./app')
 const bodyParser = require('body-parser')
 const mysql = require('mysql2')
 const ipfile = require('../Frontend/src/ip.json')
+
 app.use(bodyParser.json({ limit: process.env.BODY_PARSER_LIMT }))
 app.use(bodyParser.urlencoded({ extended: true, limit: '150mb' }))
 
@@ -29,7 +30,7 @@ app.use(
 
 //CONNECT DATABASE
 const connection = mysql.createConnection({
-  host: 'localhost',
+  host: ipfile.host,
   user: 'root',
   password: 'S2k3c0s2@1110',
   database: 'uo',

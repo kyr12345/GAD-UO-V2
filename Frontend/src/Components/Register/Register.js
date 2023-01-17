@@ -8,6 +8,7 @@ const Register = () => {
   const [password, setpassword] = useState('')
   const [email, setemail] = useState('')
   const [name, setname] = useState('')
+  const [designation, setdesignation] = useState('')
 
   const HandleSubmit = async (e) => {
     e.preventDefault()
@@ -16,6 +17,7 @@ const Register = () => {
     if (name.length === 0) err += 'Enter The Name\n'
     if (email.length === 0) err += 'Enter The Email\n'
     if (username.length === 0) err += 'Enter The Username \n'
+    if (designation.length === 0) err += 'Enter The Designation \n'
 
     if (password.length === 0) err += 'Enter The Password\n'
 
@@ -24,7 +26,7 @@ const Register = () => {
       axios
         .post(
           `http://${ipfile.ip}:3000/api/v1/register`,
-          { username, password, email, name },
+          { username, password, email, name, designation },
           {
             headers: {
               'Content-Type':
@@ -33,9 +35,7 @@ const Register = () => {
           },
         )
         .then((result) => {
-          console.log(result)
           if (result.data.success) {
-            console.log('User Register')
             alert('User Registered Successfully')
           } else {
             alert(result.data.msg)
@@ -98,6 +98,7 @@ const Register = () => {
           style={{ marginTop: '15px' }}
           required
         />
+
         <TextField
           label="Password"
           placeholder="Enter password"
@@ -107,6 +108,15 @@ const Register = () => {
           onChange={(e) => setpassword(e.target.value)}
           required
           style={{ marginTop: '15px' }}
+        />
+        <TextField
+          label="Designation"
+          placeholder="Enter Designation"
+          fullWidth
+          onChange={(e) => setdesignation(e.target.value)}
+          value={designation}
+          style={{ marginTop: '15px' }}
+          required
         />
         <Button
           type="submit"

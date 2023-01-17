@@ -1,9 +1,9 @@
 const bcrypt = require('bcryptjs')
 const mysql = require('mysql2')
-
+const ipfile = require('../../Frontend/src/ip.json')
 const connection = mysql
   .createConnection({
-    host: 'localhost',
+    host: ipfile.host,
     user: 'root',
     password: 'S2k3c0s2@1110',
     database: 'uo',
@@ -50,7 +50,7 @@ exports.LoginUser = async (req, res) => {
     } else {
       const selectuser = `SELECT*FROM USERS WHERE USERNAME=?`
       const result = await connection.query(selectuser, [username])
-      console.log(result)
+
       res.status(200).json({
         success: true,
         message: 'You are logged in ',
@@ -61,22 +61,18 @@ exports.LoginUser = async (req, res) => {
 }
 
 exports.Register = async (req, res) => {
-  const { username, password, name, email } = req.body
-  if (!username || !password || !email || !name) {
-    res.status(500).json({
-      success: false,
-      message: 'Enter Required Elements',
-    })
-  }
+  const { username, password, name, email, designation } = req.body
+
   const usernamefind = await FindUsername(username)
   if (!usernamefind) {
     const hashpass = await bcrypt.hashSync(password, 10)
-    const INSERTQuery = `INSERT INTO USERS (USERNAME,PASSWORD,name,email) VALUES (?,?,?,?)`
+    const INSERTQuery = `INSERT INTO USERS (USERNAME,PASSWORD,name,email,designation) VALUES (?,?,?,?,?)`
     const result = await connection.query(INSERTQuery, [
       username,
       hashpass,
       name,
       email,
+      designation,
     ])
     if (result[0].insertId) {
       res.status(200).json({

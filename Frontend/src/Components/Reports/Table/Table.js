@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React from 'react'
 import Box from '@mui/material/Box'
 import Collapse from '@mui/material/Collapse'
 import IconButton from '@mui/material/IconButton'
@@ -14,7 +14,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 
 import { Button } from '@material-ui/core'
-import { DownloadTableExcel } from 'react-export-table-to-excel'
+
 import * as XLSX from 'xlsx'
 
 function Row(props) {
@@ -163,7 +163,7 @@ export default function CollapsibleTable({ data }) {
       let movements = ''
       let accused = ''
       for (let j = 0; j < data[i].Movements.length; j++) {
-        if (j == 0) {
+        if (j === 0) {
           movements += `${data[i].Movements[j].MOVTO} (${data[i].Movements[
             j
           ].MOVTDATE.slice(4, 15)})`
@@ -180,12 +180,6 @@ export default function CollapsibleTable({ data }) {
         } else if (data[i].Accused[j].CUC == 'Yes') {
           accused += ` || ${data[i].Accused[j].NAME} `
         }
-        /*  
-      else if (data[i].Accused[j].CUC == 'No' && j == 0) {
-          accused += `-------`
-        } else {
-          accused += '||  ----  '
-        } */
       }
 
       const Entry = {

@@ -48,6 +48,7 @@ const Login = () => {
               JSON.stringify({
                 username: result.data.userData.username,
                 Role: result.data.userData.ROLE,
+                Designation: result.data.userData.designation,
               }),
             )
             const datas = JSON.parse(window.localStorage.getItem('ROLE_NAME'))
