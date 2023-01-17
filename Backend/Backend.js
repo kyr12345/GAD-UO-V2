@@ -33,7 +33,8 @@ const connection = mysql.createConnection({
   host: ipfile.host,
   user: 'root',
   password: 'S2k3c0s2@1110',
-  database: 'uo',
+  database: 'uo',  
+  
 })
 
 //ROUTES
