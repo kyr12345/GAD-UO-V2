@@ -1,0 +1,6 @@
+CREATE TABLE `allocation` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `ALLOCATED` varchar(255) NOT NULL,
+  `COUNT` int NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`)
+) 

@@ -1,0 +1,246 @@
+ {
+
+
+
+
+
+
+"departments":
+ [
+  {
+      "Department": "Any",
+      "id": "item1"
+    },
+    {
+      "Department": "General Administration Department",
+      "id": "item2"
+    },
+
+    {
+      "Department": "Agriculture & Co-Operation Department",
+      "id": "item2"
+    },
+    {
+      "Department": "Climate Change Department",
+      "id": "item3"
+    },
+    {
+      "Department": "Education Department",
+      "id": "item4"
+    },
+    {
+      "Department": "Energy & Petrochemicals Department",
+      "id": "item5"
+    },
+    {
+      "Department": "Finance Department",
+      "id": "item6"
+    },
+    {
+      "Department": "Food & Civil Supplies Department",
+      "id": "item7"
+    },
+    {
+      "Department": "Forest & Environment Department",
+      "id": "item8"
+    },
+    {
+      "Department": "Health & Family Welfare Department",
+      "id": "item9"
+    },
+    {
+      "Department": "Home Department",
+      "id": "item10"
+    },
+    {
+      "Department": "Industries & Mines Department",
+      "id": "item11"
+    },
+    {
+      "Department": "Information & Broadcasting Department",
+      "id": "item12"
+    },
+    {
+      "Department": "Labour, Skill Development and Employment Department",
+      "id": "item13"
+    },
+    {
+      "Department": "Legal Department",
+      "id": "item14"
+    },
+    {
+      "Department": "Legeslative & Parliamentary Affairs Department",
+      "id": "item15"
+    },
+    {
+      "Department": "Narmada, Water Resources, Water Supply & Kalpsar Department",
+      "id": "item16"
+    },
+    {
+      "Department": "Panchayat, Rural Housing & Rural Development Department",
+      "id": "item17"
+    },
+    {
+      "Department": "Port & Transport Department",
+      "id": "item18"
+    },
+    {
+      "Department": "Revenue Department",
+      "id": "item19"
+    },
+    {
+      "Department": "Road & Building Department",
+      "id": "item20"
+    },
+    {
+      "Department": "Science & Technology Department",
+      "id": "item21"
+    },
+    {
+      "Department": "Social Justice & Empowerment Department",
+      "id": "item22"
+    },
+    {
+      "Department": "Sports Youth & Cultural Activities Department",
+      "id": "item23"
+    },
+    {
+      "Department": "Tribal Development Department",
+      "id": "item24"
+    },
+    {
+      "Department": "Urban Development & Urban Housing Department",
+      "id": "item25"
+    },
+    {
+      "Department": "Women & Child Development Department",
+      "id": "item26"
+    }
+  ],
+  "accused": [
+    "Name",
+    "Designation",
+    "Class",
+    "DOR",
+    "SATHI",
+    
+    "Consideration"
+  ],
+  "file":[
+    {
+      "name": "Department Inquiry",
+      "id": 1
+    },
+    {
+      "name": "Suspension",
+      "id": 2
+    },
+    {
+      "name": "Prosecution",
+      "id": 3
+    }
+  ],
+  "allot":[
+    {
+      "name": "US-1",
+      "id": 1
+    },
+    {
+      "name": "US-2",
+      "id": 2
+    },
+    {
+      "name": "SO-1",
+      "id": 3
+    },
+    {
+      "name": "SO-2",
+      "id": 4
+    },
+    {
+      "name": "SO-3",
+      "id": 5
+    },
+    {
+      "name": "SO-4",
+      "id": 6
+    },
+    {
+      "name": "DYSO-1",
+      "id": 7
+    },
+    {
+      "name": "DYSO-2",
+      "id": 8
+    }
+  ],
+  "DepartmentInquiry":[
+    "New DE","Accepting 1st Defense","Inquiry Report","Accepting Final Defense","Penalty","GPSC","Special Defense","Acquit","Other"
+  ],
+  "Prosecution":[
+    "Approval of Prosecution","Other"
+  ],
+  "Suspension":[
+    "Deemed Suspension","Deemed + Continue Suspension"," DE Suspension","Suspension Continue","Reinstate","Other"
+  ],
+    "movements":[
+    {
+      "name": "DySO-1",
+      "id": 1
+    },
+    {
+      "name": "DySO-2",
+      "id": 2
+    },
+    {
+      "name": "SO-1",
+      "id": 3
+    },
+    {
+      "name": "SO-2",
+      "id": 4
+    },
+    {
+      "name": "SO-3",
+      "id": 5
+    },
+    {
+      "name": "SO-4",
+      "id": 6
+    },
+    {
+      "name": "US-1",
+      "id": 7
+    },
+    {
+      "name": "US-2",
+      "id": 8
+    },
+    {
+      "name": "DS",
+      "id": 9
+    },
+    {
+      "name": "ACS",
+      "id": 10
+    },
+    {
+      "name": "CS",
+      "id": 11
+    },
+    {
+      "name": "Min",
+      "id": 12
+    },
+    {
+      "name": "CM",
+      "id": 13
+    },
+    {
+      "name": "Dept",
+      "id": 14
+    }
+  ]
+  
+ }
+ 

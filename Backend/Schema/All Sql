@@ -1,0 +1,82 @@
+CREATE TABLE `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `ROLE` varchar(255) DEFAULT 'USER',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
+);
+
+INSERT INTO `users`(`id`, `name`, `email`, `username`, `password`, `ROLE`) VALUES ('[value-1]','Paresh Khokhar','pareshpvk@gmail.com','pvkhokhar','$2a$10$ABiA5T62dPsao5CgBzWD8.vE2kut7IJt1xi7ZXX5Xz7G/z5P9olHy','Admin');
+
+CREATE TABLE `filetables` (
+  `FID` int NOT NULL AUTO_INCREMENT,
+  `eSarkar` varchar(255) NOT NULL,
+  `Department` varchar(255) NOT NULL,
+  `Sub` varchar(255) NOT NULL,
+  `FType` varchar(255) NOT NULL,
+  `Stage` varchar(255) NOT NULL,
+  `Allot` varchar(255) NOT NULL,
+  `DATE_TIME` date DEFAULT NULL,
+  `USER` varchar(255) NOT NULL,
+  `UO` varchar(255) NOT NULL,
+  `fileno` varchar(255) NOT NULL,
+  PRIMARY KEY (`FID`)
+);
+
+CREATE TABLE `accused_designation` (
+  `DID` int NOT NULL AUTO_INCREMENT,
+  `DESIGNATION` varchar(255) NOT NULL,
+  `USER` varchar(255) NOT NULL,
+  `FID` int NOT NULL,
+  `AID` int NOT NULL,
+  `DATE_TIME` date NOT NULL,
+  `CLASS` int NOT NULL,
+  `CUC` varchar(255) NOT NULL,
+  PRIMARY KEY (`DID`)
+);
+
+CREATE TABLE `allocation` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `ALLOCATED` varchar(255) NOT NULL,
+  `COUNT` int NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`)
+) ;
+
+INSERT INTO `allocation`(`ID`, `ALLOCATED`, `COUNT`) VALUES ('[value-1]','US-1',0);
+INSERT INTO `allocation`(`ID`, `ALLOCATED`, `COUNT`) VALUES ('[value-1]','US-2',0);
+INSERT INTO `allocation`(`ID`, `ALLOCATED`, `COUNT`) VALUES ('[value-1]','SO-1',0);
+INSERT INTO `allocation`(`ID`, `ALLOCATED`, `COUNT`) VALUES ('[value-1]','SO-2',0);
+INSERT INTO `allocation`(`ID`, `ALLOCATED`, `COUNT`) VALUES ('[value-1]','SO-3',0);
+INSERT INTO `allocation`(`ID`, `ALLOCATED`, `COUNT`) VALUES ('[value-1]','SO-4',0);
+INSERT INTO `allocation`(`ID`, `ALLOCATED`, `COUNT`) VALUES ('[value-1]','DySO-1',0);
+INSERT INTO `allocation`(`ID`, `ALLOCATED`, `COUNT`) VALUES ('[value-1]','DySO-3',0);
+
+CREATE TABLE `accused` (
+  `AID` int NOT NULL AUTO_INCREMENT,
+  `SATHI` varchar(255) NOT NULL,
+  `CPF` varchar(255) NOT NULL,
+  `NAME` varchar(255) NOT NULL,
+  `DOR` varchar(255) NOT NULL,
+  `USER` varchar(255) NOT NULL,
+  `DATE_TIME` date NOT NULL,
+  PRIMARY KEY (`AID`)
+);
+
+CREATE TABLE `movements` (
+  `MID` int NOT NULL AUTO_INCREMENT,
+  `FID` int NOT NULL,
+  `UO` varchar(255) NOT NULL,
+  `MOVTO` varchar(255) NOT NULL,
+  `MOVTDATE` date NOT NULL,
+  `Remarks` varchar(255) NOT NULL,
+  `User` varchar(255) NOT NULL,
+  `date_time` date NOT NULL,
+  PRIMARY KEY (`MID`),
+  FOREIGN KEY (`FID`) REFERENCES `filetables` (`FID`)
+);
+
+
+
