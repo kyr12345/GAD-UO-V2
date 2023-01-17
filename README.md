@@ -6,6 +6,8 @@ npm install-g yarn
 
 yarn install 
 
+yarn add dotenv
+
 yarn start //To start the Frontend or exe can loaded
 
 
