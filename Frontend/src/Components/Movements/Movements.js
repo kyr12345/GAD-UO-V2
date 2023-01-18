@@ -32,7 +32,7 @@ function Movements() {
     if (result) {
       setuser(result.username)
     }
-    if (UONUMBER.length > 0) {
+    if (UONUMBER!=null &&UONUMBER.length > 0) {
       SETUO(UONUMBER)
 
       const handler = document.getElementById('buttonSubmit')
