@@ -106,7 +106,7 @@ exports.NewCaseForm = async (req, res) => {
 
   const AllocationCount = await connection.query(UpdateCount, [Allotment])
 
-  const Fileresult = await connection.query(FileSelectionquery, [fileno])
+  const Fileresult = await connection.query(FileSelectionquery, [esarkarno])
 
   if (Fileresult[0].length == 0) {
     const insertQueryResult = await connection.query(FiletableEntryQuery, [
