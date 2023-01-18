@@ -143,6 +143,7 @@ function Movements() {
               setnewmovement(false)
             }}
             value={UO}
+            required
             className="w-full bg-white border-2 "
             placeholder="Enter  UO Number"
           />
@@ -158,13 +159,14 @@ function Movements() {
               setnewmovement(false)
             }}
             value={esarkarno}
+            required
             className="w-full bg-white border-2 "
             placeholder="Enter  eSarkarno Number"
           />
         </div>
         <div className="flex justify-center mt-4">
           <Button
-            type="submit"
+            onClick={handleMovementTable}
             variant="contained"
             sx={{ backgroundColor: 'blue', color: 'white' }}
             endIcon={<SendIcon />}

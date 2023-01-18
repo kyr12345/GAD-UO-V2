@@ -109,6 +109,7 @@ function ReportUser() {
                   <StyledTableCell align="center">eSarkar No</StyledTableCell>
                   <StyledTableCell align="center">Department</StyledTableCell>
                   <StyledTableCell align="center">Accused Name</StyledTableCell>
+                  <StyledTableCell align="center"> Case Stage</StyledTableCell>
                   <StyledTableCell align="center">Deadline</StyledTableCell>
                   <StyledTableCell align="center">
                     Submission Date
@@ -144,9 +145,18 @@ function ReportUser() {
                             <ul>
                               {file.accused.length > 0 &&
                                 file.accused.map((accused) => {
-                                  return <li>{accused}</li>
+                                  return (
+                                    <>
+                                      <li>{accused}</li>
+                                      ----------
+                                    </>
+                                  )
                                 })}
                             </ul>
+                          </StyledTableCell>
+
+                          <StyledTableCell align="center">
+                            {file.casestage}
                           </StyledTableCell>
                           <StyledTableCell align="center">
                             {file.deadline.slice(4, 15)}

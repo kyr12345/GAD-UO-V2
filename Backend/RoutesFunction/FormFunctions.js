@@ -897,7 +897,7 @@ exports.GetWorkSheetOnDesignation = async (req, res) => {
   console.log(data[0])
   /* details of each UO */
   if (data[0].length > 0) {
-    const queryForData = `SELECT* FROM FILETABLES INNER JOIN ACCUSED_DESIGNATION INNER JOIN ACCUSED ON ACCUSED_DESIGNATION.AID=ACCUSED.AID ON FILETABLES.FID=ACCUSED_DESIGNATION.FID WHERE FILETABLES.UO=?`
+    const queryForData = `SELECT* FROM FILETABLES INNER JOIN ACCUSED_DESIGNATION INNER JOIN ACCUSED ON ACCUSED_DESIGNATION.AID=ACCUSED.AID ON FILETABLES.FID=ACCUSED_DESIGNATION.FID WHERE FILETABLES.UO=? `
 
     let accused = []
 
@@ -919,7 +919,7 @@ exports.GetWorkSheetOnDesignation = async (req, res) => {
       }
 
       const datas = await connection.query(queryForData, [data[0][i].UO])
-
+      console.log(datas[0])
       for (let j = 0; j < datas[0].length; j++) {
         accused.push(datas[0][j].NAME)
       }
@@ -934,13 +934,12 @@ exports.GetWorkSheetOnDesignation = async (req, res) => {
           deadline: datas[0][0].DEADLINE,
           status: data[0][i].CONFIRMATION,
           submission_date,
+          casestage: datas[0][0].Stage,
         })
       }
       accused = []
     }
-    Response.sort((a, b) => {
-      a.deadline - b.deadline
-    })
+    Response.sort((a, b) => a.deadline - b.deadline)
 
     for (let i = 0; i < Response.length; i++) {
       Response[i].deadline = Response[i].deadline + 1

@@ -31,9 +31,9 @@ app.use(
 //CONNECT DATABASE
 const connection = mysql.createConnection({
   host: ipfile.host,
-  user: 'root',
-  password: 'S2k3c0s2@1110',
-  database: 'uo',
+  user: ipfile.user,
+  password: ipfile.password,
+  database: ipfile.database,
 })
 
 //ROUTES
@@ -43,7 +43,7 @@ app.use('/api/v1', Form)
 
 //SERVER START
 
-connection.query('SET GLOBAL connect_timeout=280000000')
+connection.query('SET GLOBAL connect_timeout=280000000000')
 
 connection.connect((err, result) => {
   if (err) {

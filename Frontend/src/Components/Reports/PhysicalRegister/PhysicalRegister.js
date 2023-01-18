@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 import axios from 'axios'
 import ipfile from '../../../ip.json'
 import Table from '../Table/Table'
 function PhysicalRegister() {
   const [fromdate, setfromdate] = useState('')
-  const [todate, settodate] = useState('')
+  const [todate, settodate] = useState(new Date().toLocaleDateString('en-CA'))
 
   const [showdatetable, setshowdatetable] = useState(false)
   const [resultdate, setresultdate] = useState([])
@@ -60,7 +60,7 @@ function PhysicalRegister() {
 
               <input
                 type="date"
-                value={todate}
+                value={todate.length > 0 ? todate : new Date().toISOString()}
                 onChange={(e) => {
                   settodate(e.target.value)
                   setshowdatetable(false)

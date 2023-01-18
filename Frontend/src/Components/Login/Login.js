@@ -2,12 +2,10 @@ import React, { useState } from 'react'
 import { Grid, Paper, Avatar, TextField, Button } from '@material-ui/core'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { useSelector } from 'react-redux'
+
 import ipfile from '../../ip.json'
-/* import processeNV from '../../../.env' */
+
 const Login = () => {
-  const dispatch = useDispatch()
   const [username, setusername] = useState('')
   const [password, setpassword] = useState('')
   const navigate = useNavigate()
@@ -84,40 +82,38 @@ const Login = () => {
         <Paper style={paperStyle}>
           <Grid align="center">
             <Avatar style={avatarStyle}>
-              <img
-                src="https://wallpapercave.com/wp/wp3478342.jpg"
-                alt="image"
-              />
+              <img src="https://wallpapercave.com/wp/wp3478342.jpg" alt="sds" />
             </Avatar>
           </Grid>
-          <h2 className="font-bold mt-4 text-center">LOG IN</h2>
-          <TextField
-            label="Username"
-            placeholder="Enter username"
-            fullWidth
-            style={{ marginTop: '45px' }}
-            onChange={(e) => setusername(e.target.value)}
-            required
-          />
-          <TextField
-            label="Password"
-            placeholder="Enter password"
-            type="password"
-            fullWidth
-            style={{ marginTop: '45px' }}
-            onChange={(e) => setpassword(e.target.value)}
-            required
-          />
-          <Button
-            type="submit"
-            color="primary"
-            variant="contained"
-            style={btnstyle}
-            onClick={HandleSubmit}
-            fullWidth
-          >
-            Log in
-          </Button>
+          <form onSubmit={HandleSubmit} method="POST">
+            <h2 className="font-bold mt-4 text-center">LOG IN</h2>
+            <TextField
+              label="Username"
+              placeholder="Enter username"
+              fullWidth
+              style={{ marginTop: '45px' }}
+              onChange={(e) => setusername(e.target.value)}
+              required
+            />
+            <TextField
+              label="Password"
+              placeholder="Enter password"
+              type="password"
+              fullWidth
+              style={{ marginTop: '45px' }}
+              onChange={(e) => setpassword(e.target.value)}
+              required
+            />
+            <Button
+              type="submit"
+              color="primary"
+              variant="contained"
+              style={btnstyle}
+              fullWidth
+            >
+              Log in
+            </Button>
+          </form>
         </Paper>
       </Grid>
     </div>
