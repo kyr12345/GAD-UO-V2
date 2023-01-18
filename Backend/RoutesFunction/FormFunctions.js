@@ -51,7 +51,7 @@ exports.GetLatestAllocation = async (req, res) => {
 exports.NewCaseForm = async (req, res) => {
   //Query For Table
 
-  const FileSelectionquery = `SELECT*FROM FILETABLES WHERE FILENO=?`
+  const FileSelectionquery = `SELECT*FROM FILETABLES WHERE esarkar=?`
   const datequery = `SELECT*FROM FILETABLES WHERE YEAR(DATE_TIME)=?`
   const FiletableEntryQuery = `INSERT INTO FILETABLES (FILENO,eSarkar,DEPARTMENT,SUB,FTYPE,STAGE,ALLOT,USER,DATE_TIME,UO,DEADLINE,Attachment) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`
 
@@ -214,7 +214,7 @@ exports.NewCaseForm = async (req, res) => {
         UO,
       })
     } else {
-      const deleteQuery = `DELETE FROM FILETABLES WHERE FILENO=?`
+      const deleteQuery = `DELETE FROM FILETABLES WHERE FILENO=? `
       const quertExecute = await connection.query(deleteQuery, [insertid])
 
       fields.map(async () => {
@@ -230,7 +230,7 @@ exports.NewCaseForm = async (req, res) => {
     }
   } else {
     res.status(200).json({
-      msg: 'File Already Exist',
+      msg: 'File With eSarkar Exist',
       success: false,
     })
   }

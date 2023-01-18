@@ -92,9 +92,8 @@ function ReportUser() {
   }))
   return (
     <div>
-      <div className="text-center font-bold text-4xl py-4">Reports </div>
+      <div className="text-center font-bold text-4xl py-4">WorkSheet </div>
       <div className="flex items-start px-8 mt-8 flex-col w-full">
-        <p className="font-bold mb-4">WorkSheet</p>
         <div className="w-full">
           <TableContainer component={Paper}>
             <Table

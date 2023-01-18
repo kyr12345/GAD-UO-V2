@@ -32,7 +32,7 @@ function Movements() {
     if (result) {
       setuser(result.username)
     }
-    if (UONUMBER!=null &&UONUMBER.length > 0) {
+    if (UONUMBER != null && UONUMBER.length > 0) {
       SETUO(UONUMBER)
 
       const handler = document.getElementById('buttonSubmit')
@@ -95,12 +95,12 @@ function Movements() {
     let err = ''
     if (esarkarno.length === 0) {
       input = {
-        search: UO,
+        search: UO.trim(),
         state: 1,
       }
     } else {
       input = {
-        search: esarkarno,
+        search: esarkarno.trim(),
         state: 2,
       }
     }
@@ -195,10 +195,17 @@ function Movements() {
           <div className="text-center font-bold text-xl mt-10">
             Previous Movement Table
           </div>
-          <div className="flex flex-col">
-            <div className="mt-6 text-xl text-center">
-              <span className="font-bold text-xl ">FILE NO:</span>{' '}
-              {FileEntry.fileno}({FileEntry.eSarkar})
+          <div className="flex flex-col ">
+            <div className="mt-6 text-xl flex flex-col items-center justify-start ">
+              <div className="mb-4">
+                <span className="font-bold text-xl ">FILE NO:</span>{' '}
+                {FileEntry.fileno}
+              </div>
+              <div>
+                <span className="font-bold text-xl ">eSarkar NO:</span>
+                {' '}
+                {FileEntry.eSarkar}
+              </div>
             </div>
             <div className="overflow-x-auto ">
               <div className="py-4 inline-block w-full sm:px-6 lg:px-8">

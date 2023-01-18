@@ -128,8 +128,8 @@ function InwardNew() {
 
     console.log(Other)
     const inputs = {
-      fileno,
-      esarkarno,
+      fileno: fileno.trim(),
+      esarkarno: esarkarno.trim(),
       department,
       subject,
       filetype,
@@ -633,7 +633,7 @@ function InwardNew() {
               </button>
             </div>
           </div>
-          <div className="flex justify-center">
+          <div className="flex my-8 justify-center">
             <Button type="submit" color="primary" variant="contained">
               REGISTER
             </Button>
