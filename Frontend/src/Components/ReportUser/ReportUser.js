@@ -28,12 +28,12 @@ function ReportUser() {
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
           },
         })
-
+        console.log(data.data)
         setworksheet(data.data.data)
       }
     }
     CheckAndFetchWorkSheet()
-  }, [])
+  }, [navigate, userdata.Designation, userdata.username.length])
 
   const handleDownload = () => {
     const printingResponse = []

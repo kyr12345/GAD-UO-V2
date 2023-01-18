@@ -36,10 +36,11 @@ function Movements() {
       SETUO(UONUMBER)
 
       const handler = document.getElementById('buttonSubmit')
-      handler.click()
+
       setTimeout(() => {
         window.localStorage.setItem('UO', '')
-      }, 5000)
+        handler.click()
+      }, 100)
     }
   }, [result, newmovementdate])
 
@@ -97,8 +98,6 @@ function Movements() {
         search: UO,
         state: 1,
       }
-    } else if (esarkarno.length > 0 && UO.length > 0) {
-      err += 'Enter Only In One Field'
     } else {
       input = {
         search: esarkarno,
@@ -311,7 +310,7 @@ function Movements() {
         </>
       )}
       {showmovement && (
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center my-8">
           <Button
             onClick={handleNewMovement}
             variant="contained"

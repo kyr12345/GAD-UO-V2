@@ -36,6 +36,7 @@ const Login = () => {
         )
         .then((result) => {
           if (result.data.success) {
+            console.log(result.data)
             /* dispatch({
               type: 'SET_USER',
               payload: {
@@ -48,7 +49,7 @@ const Login = () => {
               JSON.stringify({
                 username: result.data.userData.username,
                 Role: result.data.userData.ROLE,
-                Designation: result.data.userData.designation,
+                Designation: result.data.userData.Designation,
               }),
             )
             const datas = JSON.parse(window.localStorage.getItem('ROLE_NAME'))

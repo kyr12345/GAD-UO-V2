@@ -1,11 +1,11 @@
 const mysql = require('mysql2')
-const ipfile = require('../../Frontend/src/ip.json')
+const ip = require('../../Frontend/src/ip.json')
 const connection = mysql
   .createConnection({
-    host: ipfile.host,
-    user: 'root',
-    password: 'S2k3c0s2@1110',
-    database: 'uo',
+    host: ip.host,
+    user: ip.user,
+    password: ip.password,
+    database: ip.database,
   })
   .promise()
 const AccusedEntryQuery = `INSERT INTO ACCUSED (SATHI,NAME,DOR,USER,DATE_TIME) VALUES (?,?,?,?,?)`
@@ -499,7 +499,7 @@ exports.Movement = async (req, res) => {
 
   const FindOnUO = `SELECT*FROM MOVEMENTS WHERE UO=?`
 
-  if (state === '1') {
+  if (state === '1' && search.length > 0) {
     const EntryFromMovement = await connection.query(FindOnUO, [search])
     const entryfromFiletables = await connection.query(
       `SELECT*FROM FILETABLES WHERE UO=?`,
@@ -614,7 +614,6 @@ exports.NewMovement = async (req, res) => {
   if (result[0].insertId) {
     const previousEntryCompletion = await connection.query(UpdateQuery, [
       'YES',
-
       UO,
       designation,
     ])
@@ -903,6 +902,22 @@ exports.GetWorkSheetOnDesignation = async (req, res) => {
     let accused = []
 
     for (let i = 0; i < data[0].length; i++) {
+      const QueryForUO = `SELECT*FROM MOVEMENTS WHERE UO=?`
+      const uodata = await connection.query(QueryForUO, [data[0][i].UO])
+      let submission_date
+
+      if (uodata[0].length > 1) {
+        for (let j = 0; j < uodata[0].length; j++) {
+          if (uodata[0][j].MID === data[0][i].MID) {
+            if (j != uodata[0].length - 1)
+              submission_date = uodata[0][j + 1].MOVTDATE + 1
+            else if (j == uodata[0].length - 1) submission_date = 'Pending'
+          }
+        }
+      } else if (uodata[0].length == 1) {
+        submission_date = 'Pending'
+      }
+
       const datas = await connection.query(queryForData, [data[0][i].UO])
 
       for (let j = 0; j < datas[0].length; j++) {
@@ -918,15 +933,15 @@ exports.GetWorkSheetOnDesignation = async (req, res) => {
           accused,
           deadline: datas[0][0].DEADLINE,
           status: data[0][i].CONFIRMATION,
-          submission_date:
-            data[0][i].CONFIRMATION === 'NO'
-              ? 'Pending'
-              : data[0][i].MOVTDATE + 1,
+          submission_date,
         })
       }
       accused = []
     }
-    Response.sort((a, b) => a.deadline - b.deadline)
+    Response.sort((a, b) => {
+      a.deadline - b.deadline
+    })
+
     for (let i = 0; i < Response.length; i++) {
       Response[i].deadline = Response[i].deadline + 1
     }
