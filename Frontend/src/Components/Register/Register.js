@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Grid, Paper, Avatar, TextField, Button } from '@material-ui/core'
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
+
 import axios from 'axios'
 import ipfile from '../../ip.json'
 const Register = () => {
@@ -65,69 +65,69 @@ const Register = () => {
       <Paper style={paperStyle}>
         <Grid align="center">
           <Avatar style={avatarStyle}>
-            <img src="https://wallpapercave.com/wp/wp3478342.jpg" />
+            <img src="https://wallpapercave.com/wp/wp3478342.jpg" alt="sasd" />
           </Avatar>
 
           <h2>Register New User</h2>
         </Grid>
+        <form onSubmit={HandleSubmit} method="POST">
+          <TextField
+            label="Name"
+            placeholder="Enter Name"
+            fullWidth
+            value={name}
+            onChange={(e) => setname(e.target.value)}
+            required
+            style={{ marginTop: '15px' }}
+          />
+          <TextField
+            label="Email"
+            placeholder="Enter Email"
+            fullWidth
+            onChange={(e) => setemail(e.target.value)}
+            required
+            value={email}
+            style={{ marginTop: '15px' }}
+          />
+          <TextField
+            label="Username"
+            placeholder="Enter username"
+            fullWidth
+            onChange={(e) => setusername(e.target.value)}
+            value={username}
+            style={{ marginTop: '15px' }}
+            required
+          />
 
-        <TextField
-          label="Name"
-          placeholder="Enter Name"
-          fullWidth
-          value={name}
-          onChange={(e) => setname(e.target.value)}
-          required
-          style={{ marginTop: '15px' }}
-        />
-        <TextField
-          label="Email"
-          placeholder="Enter Email"
-          fullWidth
-          onChange={(e) => setemail(e.target.value)}
-          required
-          value={email}
-          style={{ marginTop: '15px' }}
-        />
-        <TextField
-          label="Username"
-          placeholder="Enter username"
-          fullWidth
-          onChange={(e) => setusername(e.target.value)}
-          value={username}
-          style={{ marginTop: '15px' }}
-          required
-        />
-
-        <TextField
-          label="Password"
-          placeholder="Enter password"
-          type="password"
-          fullWidth
-          value={password}
-          onChange={(e) => setpassword(e.target.value)}
-          required
-          style={{ marginTop: '15px' }}
-        />
-        <TextField
-          label="Designation"
-          placeholder="Enter Designation"
-          fullWidth
-          onChange={(e) => setdesignation(e.target.value)}
-          value={designation}
-          style={{ marginTop: '15px' }}
-          required
-        />
-        <Button
-          type="submit"
-          color="primary"
-          variant="contained"
-          style={btnstyle}
-          onClick={HandleSubmit}
-          fullWidth
-        >
-          REGISTER
-        </Button>
+          <TextField
+            label="Password"
+            placeholder="Enter password"
+            type="password"
+            fullWidth
+            value={password}
+            onChange={(e) => setpassword(e.target.value)}
+            required
+            style={{ marginTop: '15px' }}
+          />
+          <TextField
+            label="Designation"
+            placeholder="Enter Designation"
+            fullWidth
+            onChange={(e) => setdesignation(e.target.value)}
+            value={designation}
+            style={{ marginTop: '15px' }}
+            required
+          />
+          <Button
+            type="submit"
+            color="primary"
+            variant="contained"
+            style={btnstyle}
+            fullWidth
+          >
+            REGISTER
+          </Button>
+        </form>
       </Paper>
     </Grid>
   )

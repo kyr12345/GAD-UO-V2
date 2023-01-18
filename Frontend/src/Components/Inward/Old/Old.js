@@ -692,7 +692,7 @@ function InwardOld({
 
               {secondbtn && (
                 <>
-                  <div className="flex justify-center mt-4">
+                  <div className="flex justify-center mb-8 mt-4">
                     <Button
                       onClick={handleUpdateForm}
                       variant="contained"
