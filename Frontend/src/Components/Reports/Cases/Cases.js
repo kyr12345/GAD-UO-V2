@@ -54,7 +54,7 @@ function Cases() {
             select
             value={department}
             onChange={handleChange}
-            className="w-full py-4 px-2 rounded-xl bg-white overflow-y-wrap"
+            className="w-full py-4 border-2 border-black px-2 rounded-xl bg-white overflow-y-wrap"
             placeholder="Select Department"
           >
             {JSONfile['departments'].map((option) => (

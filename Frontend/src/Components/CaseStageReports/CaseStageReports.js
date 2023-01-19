@@ -4,19 +4,27 @@ import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell, { tableCellClasses } from '@mui/material/TableCell'
 import axios from 'axios'
+import AllFiles from '../Inward/Departments.json'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import ipfile from '../../ip.json'
 import Paper from '@mui/material/Paper'
 import { Button } from '@mui/material'
+
 function CaseStageReports() {
-  const url = `http://${ipfile.ip}:3000/api/v1/dates`
+  const url = `http://${ipfile.ip}:3000/api/v1/CaseStageReports`
   const [fromdate, setfromdate] = useState('')
 
   const [todate, settodate] = useState(new Date().toLocaleDateString('en-CA'))
 
   const [showreports, setshowreports] = useState(false)
+
+  const [reports, setreports] = useState([])
+
+  useEffect(() => {
+    AllFiles['AllFiles'].sort()
+  }, [])
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -50,11 +58,53 @@ function CaseStageReports() {
       },
     })
     console.log(data)
+
+    if (data.data.success) {
+      setshowreports(true)
+
+      let datas = data.data.data
+
+      if (datas.length > 0) {
+        for (let j = 0; j < datas.length; j++) {
+          if (datas[j].stages.length > 0) {
+            for (let i = 0; i < AllFiles['AllFiles'].length; i++) {
+              if (
+                datas[j].stages.findIndex(
+                  (entry) => entry.stage === AllFiles['AllFiles'][i],
+                ) == '-1'
+              ) {
+                datas[j].stages.push({
+                  stage: AllFiles['AllFiles'][i],
+                  count: 0,
+                })
+              }
+            }
+            datas[j].stages.sort((a, b) =>
+              a.stage > b.stage ? 1 : b.stage > a.stage ? -1 : 0,
+            )
+          } else {
+            const stageUpdate = []
+
+            for (let k = 0; k < AllFiles['AllFiles'].length; k++) {
+              stageUpdate.push({
+                stage: AllFiles['AllFiles'][k],
+                count: 0,
+              })
+            }
+
+            datas[j].stages = stageUpdate
+          }
+        }
+      } else {
+        console.log('fone')
+      }
+      setreports(datas)
+    }
   }
 
   return (
     <div>
-      <p>Case Stage Reports</p>
+      <p className="font-bold text-xl text-center my-4">Case Stage Reports</p>
 
       <form onSubmit={handleDateSearch} method="POST">
         <div className="flex flex-col align-items-center ">
@@ -96,42 +146,100 @@ function CaseStageReports() {
         </div>
       </form>
 
-      {showreports && (
-        <TableContainer component={Paper}>
-          <Table
-            sx={{ minWidth: 700, height: 50 }}
-            aria-label="customized table"
-          >
-            <TableHead>
-              <TableRow>
-                <StyledTableCell align="center">
-                  Previous Month Pending
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  New Cases Recieved
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  Submitted Cases This Month
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  Currently Pending Cases
-                </StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <StyledTableRow key="one">
-                <StyledTableCell
-                  component="th"
-                  scope="row"
-                  align="center"
-                ></StyledTableCell>
-                <StyledTableCell align="center"></StyledTableCell>
-                <StyledTableCell align="center"></StyledTableCell>
-                <StyledTableCell align="center"></StyledTableCell>
-              </StyledTableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
+      {showreports && reports.length > 0 && (
+        <div className="px-16 mt-8">
+          <TableContainer component={Paper}>
+            <Table
+              sx={{ minWidth: 700, height: 50 }}
+              aria-label="customized table"
+            >
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell align="center">Designation</StyledTableCell>
+                  {AllFiles['AllFiles'].length > 0 &&
+                    AllFiles['AllFiles'].map((stage) => {
+                      return (
+                        <>
+                          <StyledTableCell align="center">
+                            {stage}
+                          </StyledTableCell>
+                        </>
+                      )
+                    })}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {reports.length > 0 &&
+                  reports.map((report, i) => {
+                    return (
+                      <StyledTableRow key={i + 1}>
+                        <StyledTableCell
+                          component="th"
+                          scope="row"
+                          align="center"
+                        >
+                          {report.Allot}
+                        </StyledTableCell>
+
+                        {report.stages.map((everystage) => (
+                          <StyledTableCell>{everystage.count}</StyledTableCell>
+                        ))}
+
+                        {/*    <StyledTableCell align="center">
+                          {report.stages[0].count}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {report.stages[1].count}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {report.stages[1].count}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {report.stages[2].count}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {report.stages[3].count}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {report.stages[4].count}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {report.stages[5].count}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {report.stages[6].count}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {report.stages[7].count}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {report.stages[8].count}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {report.stages[9].count}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {report.stages[10].count}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {report.stages[11].count}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {report.stages[12].count}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {report.stages[13].count}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {report.stages[14].count}
+                        </StyledTableCell> */}
+                      </StyledTableRow>
+                    )
+                  })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
       )}
     </div>
   )

@@ -944,4 +944,34 @@ exports.UsersAllocation = async (req, res) => {
   })
 }
 
-exports.CaseStageReports = async (req, res) => {}
+exports.CaseStageReports = async (req, res) => {
+  const { from, to } = req.body
+  const response = []
+  const allocate = await connection.query(`SELECT allocated FROM allocation`)
+
+  for (let i = 0; i < allocate[0].length; i++) {
+    const query = await connection.query(
+      `SELECT allot, STAGE, COUNT(STAGE) FROM FILETABLES WHERE ALLOT=? and date_time>=? and date_time<=? GROUP BY STAGE`,
+      [allocate[0][i].allocated, from, to],
+    )
+    let ansObj = { Allot: '', stages: [] }
+
+    if (query[0].length > 0) {
+      ansObj.Allot = query[0][0].allot
+
+      for (let k = 0; k < query[0].length; k++) {
+        ansObj.stages.push({
+          stage: query[0][k].STAGE,
+          count: query[0][k]['COUNT(STAGE)'],
+        })
+      }
+    } else {
+      ansObj.Allot = allocate[0][i].allocated
+    }
+    response.push(ansObj)
+  }
+  res.status(200).json({
+    success: true,
+    data: response,
+  })
+}

@@ -175,14 +175,20 @@
     }
   ],
   "DepartmentInquiry":[
-    "New DE","Accepting 1st Defense","Inquiry Report","Accepting Final Defense","Penalty","GPSC","Special Defense","Acquit","Other"
+    "New DE","Accepting 1st Defense","Inquiry Report","Accepting Final Defense","Penalty","GPSC","Special Defense","Acquit","Other","Guidance"
   ],
   "Prosecution":[
-    "Approval of Prosecution","Other"
+    "Approval of Prosecution","Other","Guidance"
   ],
   "Suspension":[
-    "Deemed Suspension","Deemed + Continue Suspension"," DE Suspension","Suspension Continue","Reinstate","Other"
+    "Deemed Suspension","Deemed + Continue Suspension"," DE Suspension","Suspension Continue","Reinstate","Other","Guidance"
   ],
+"AllFiles":[
+"New DE","Accepting 1st Defense","Inquiry Report","Accepting Final Defense","Penalty","GPSC","Special Defense","Acquit","Guidance","Approval of Prosecution",  "Deemed Suspension","Deemed + Continue Suspension"," DE Suspension","Suspension Continue","Reinstate"
+],
+
+
+
     "movements":[
     {
       "name": "DySO-1",
