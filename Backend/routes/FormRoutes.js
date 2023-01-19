@@ -12,9 +12,10 @@ const {
   GetFileOnDesignation,
   GetWorkSheetOnDesignation,
   UsersAllocation,
+  CaseStageReports,
 } = require('../RoutesFunction/FormFunctions')
 
-router.route('/getFromUO/:number/:year').get(OldForm)
+router.route('/getFromUO').post(OldForm)
 router.route('/getLatestAllocation').get(GetLatestAllocation)
 router.route('/requestFiles/:designation').get(GetFileOnDesignation)
 router.route('/requestWorkSheet/:designation').get(GetWorkSheetOnDesignation)
@@ -24,5 +25,6 @@ router.route('/newmovement').post(NewMovement)
 router.route('/caseInfo').post(Cases)
 router.route('/dates').post(DateSearch)
 router.route('/NewCaseForm').post(NewCaseForm)
+router.route('/CaseStageReports').post(CaseStageReports)
 router.route('/Update').post(UpdateForm)
 module.exports = router

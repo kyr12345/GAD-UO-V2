@@ -202,8 +202,7 @@ function Movements() {
                 {FileEntry.fileno}
               </div>
               <div>
-                <span className="font-bold text-xl ">eSarkar NO:</span>
-                {' '}
+                <span className="font-bold text-xl ">eSarkar NO:</span>{' '}
                 {FileEntry.eSarkar}
               </div>
             </div>

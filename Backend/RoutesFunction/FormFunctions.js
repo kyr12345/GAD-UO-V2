@@ -20,27 +20,7 @@ exports.GetLatestAllocation = async (req, res) => {
   const Query = `select*from allocation WHERE ALLOCATE=1 ORDER BY COUNT `
   const response = await connection.query(Query)
 
-  /*  const AllocationPersons = ['US-1', 'US-2', 'SO-2', 'SO-3', 'DYSO-1', 'DYSO-4'] */
-
   const AllocationList = response[0]
-  /* Added New Person */
-  /*   for (let i = 0; i < AllocationPersons.length; i++) {
-    if (
-      response[0].find(
-        (respon) => respon.ALLOCATED === AllocationPersons[i],
-      ) === undefined
-    ) {
-      AllocationList.push({ ALLOCATED: AllocationPersons[i], COUNT: 0 })
-    }
-  } */
-
-  /* Deleted New One */
-  /* 
-  for (let i = 0; i < AllocationList.length; i++) {
-    if (AllocationPersons.indexOf(AllocationList[i].ALLOCATED) === -1) {
-      AllocationList.splice(i, 1)
-    }
-  } */
 
   res.status(200).json({
     success: true,
@@ -56,8 +36,6 @@ exports.NewCaseForm = async (req, res) => {
   const FiletableEntryQuery = `INSERT INTO FILETABLES (FILENO,eSarkar,DEPARTMENT,SUB,FTYPE,STAGE,ALLOT,USER,DATE_TIME,UO,DEADLINE,Attachment) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`
   const QueryForAllocationRatio = `SELECT RATIO FROM ALLOCATION WHERE ALLOCATED=?`
 
-  /*   const CheckAllotment = `SELECT*FROM ALLOCATION WHERE ALLOCATED=?`
-  const InsertInAllotment = `INSERT INTO ALLOCATION (ALLOCATED,COUNT) VALUES(?,0)` */
   let {
     fileno,
     esarkarno,
@@ -74,22 +52,6 @@ exports.NewCaseForm = async (req, res) => {
   } = req.body
 
   const ratio = await connection.query(QueryForAllocationRatio, [Allotment])
-
-  /*   if (Allotment) {
-    const AllocationResponse = await connection.query(CheckAllotment, [
-      Allotment,
-    ])
-    if (AllocationResponse[0].length == 0) {
-      const response = await connection.query(InsertInAllotment, [Allotment])
-      if (response[0].insertId) {
-      } else {
-        res.status(200).json({
-          success: false,
-          msg: 'Not Been Allocated',
-        })
-      }
-    }
-  } */
 
   if (date.length === 0) {
     let dt = new Date()
@@ -242,14 +204,21 @@ exports.NewCaseForm = async (req, res) => {
 }
 
 exports.OldForm = async (req, res) => {
-  const year = req.params.year
-  const numbers = req.params.number
-  const uo = `${numbers}/${year}`
-  const EntryFromUoTable = await connection.query(
-    `SELECT*FROM FILETABLES WHERE UO="${uo}"`,
-  )
+  const state = req.body.state
+  const search = req.body.search
 
-  if (EntryFromUoTable[0].length > 0) {
+  let EntryFromUoTable
+  if (state == 1) {
+    EntryFromUoTable = await connection.query(
+      `SELECT*FROM FILETABLES WHERE  UO="${search}"`,
+    )
+  } else {
+    EntryFromUoTable = await connection.query(
+      `SELECT*FROM FILETABLES WHERE  esarkar REGEXP "${search}"`,
+    )
+  }
+
+  if (EntryFromUoTable[0].length == '1') {
     const FileEntryDetails = EntryFromUoTable[0][0]
     const FID = EntryFromUoTable[0][0].FID
 
@@ -275,10 +244,20 @@ exports.OldForm = async (req, res) => {
         Data: Alldata,
       })
     }
-  } else {
+  } else if (EntryFromUoTable[0].length > 1 && state == '2') {
+    res.status(200).json({
+      success: false,
+      msg: 'Enter Complete eSarkar',
+    })
+  } else if (state == '1' && EntryFromUoTable[0].length == 0) {
     res.status(200).json({
       success: false,
       msg: 'File With UO Does Not Exists',
+    })
+  } else if (state == '2' && EntryFromUoTable[0].length == 0) {
+    res.status(200).json({
+      success: false,
+      msg: 'File With eSarkar Does Not Exists',
     })
   }
 }
@@ -964,3 +943,5 @@ exports.UsersAllocation = async (req, res) => {
     data: data[0],
   })
 }
+
+exports.CaseStageReports = async (req, res) => {}

@@ -20,8 +20,9 @@ function InwardOld({
   /*   const result = useSelector((state) => state.user.currentUser) */
   const result = JSON.parse(window.localStorage.getItem('ROLE_NAME'))
   const [UO, SETUO] = useState('')
+  const [esarkar, setesarkar] = useState('')
   if (uonumber === '') uonumber = UO
-  const request = `http://${ipfile.ip}:3000/api/v1/getFromUO/${uonumber}`
+  const request = `http://${ipfile.ip}:3000/api/v1/getFromUO`
   const UpdateRequest = `http://${ipfile.ip}:3000/api/v1/Update`
   const [Other, SetOther] = useState('')
   const [position, setposition] = useState(false)
@@ -44,10 +45,22 @@ function InwardOld({
   const handleSubmit = (event) => {
     event.preventDefault()
 
-    console.log(request)
+    let input = {}
+
+    if (esarkarno.length === 0) {
+      input = {
+        search: UO.trim(),
+        state: 1,
+      }
+    } else {
+      input = {
+        search: esarkar.trim(),
+        state: 2,
+      }
+    }
 
     axios
-      .get(request, {
+      .post(request, input, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         },
@@ -228,20 +241,36 @@ function InwardOld({
 
       <form onSubmit={handleSubmit} method="GET">
         {show && (
-          <div className="flex flex-col mt-4 px-4 align-items-center justify-center">
-            <h4 className="font-bold">Enter The UO Number:</h4>
-            <TextField
-              onChange={(e) => {
-                SETUO(e.target.value)
-                setFields([])
-                setposition(false)
-              }}
-              value={UO}
-              required
-              className="w-full bg-white"
-              placeholder="Enter The UO Number"
-            />
-          </div>
+          <>
+            <div className="flex flex-col mt-4 px-4 align-items-center justify-center">
+              <h4 className="font-bold">Enter The UO Number:</h4>
+              <TextField
+                onChange={(e) => {
+                  SETUO(e.target.value)
+                  setFields([])
+                  setposition(false)
+                  setesarkar('')
+                }}
+                value={UO}
+                className="w-full bg-white"
+                placeholder="Enter The UO Number"
+              />
+            </div>
+            <div className="flex flex-col mt-4 px-4 align-items-center justify-center">
+              <h4 className="font-bold">Enter eSarkar Number:</h4>
+              <TextField
+                onChange={(e) => {
+                  setesarkar(e.target.value)
+                  setFields([])
+                  SETUO('')
+                  setposition(false)
+                }}
+                value={esarkar}
+                className="w-full bg-white"
+                placeholder="Enter The UO Number"
+              />
+            </div>
+          </>
         )}
 
         <div className="flex justify-center mt-4">

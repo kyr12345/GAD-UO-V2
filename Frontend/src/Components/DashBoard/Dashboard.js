@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import ReportUser from '../ReportUser/ReportUser'
+import CaseStageReports from '../CaseStageReports/CaseStageReports'
 import AdminReports from '../AdminReports/AdminReports'
 function Dashboard() {
   const dispatch = useDispatch()
@@ -85,6 +86,11 @@ function Dashboard() {
         {newform && newform === 'reportsForAdmin' && (
           <>
             <AdminReports />
+          </>
+        )}
+        {newform && newform === 'caseStageReports' && (
+          <>
+            <CaseStageReports />
           </>
         )}
       </div>
