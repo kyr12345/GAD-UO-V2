@@ -17,14 +17,14 @@ const Movement_Entry = `INSERT INTO movements (FID,UO,MOVTO,MOVTDATE,REMARKS,USE
 /* get latest allocation */
 
 exports.GetLatestAllocation = async (req, res) => {
-  const Query = `select*from allocation  ORDER BY COUNT ;`
+  const Query = `select*from allocation WHERE ALLOCATE=1 ORDER BY COUNT `
   const response = await connection.query(Query)
 
-  const AllocationPersons = ['US-1', 'US-2', 'SO-2', 'SO-3', 'DYSO-1', 'DYSO-4']
+  /*  const AllocationPersons = ['US-1', 'US-2', 'SO-2', 'SO-3', 'DYSO-1', 'DYSO-4'] */
 
   const AllocationList = response[0]
   /* Added New Person */
-  for (let i = 0; i < AllocationPersons.length; i++) {
+  /*   for (let i = 0; i < AllocationPersons.length; i++) {
     if (
       response[0].find(
         (respon) => respon.ALLOCATED === AllocationPersons[i],
@@ -32,15 +32,15 @@ exports.GetLatestAllocation = async (req, res) => {
     ) {
       AllocationList.push({ ALLOCATED: AllocationPersons[i], COUNT: 0 })
     }
-  }
+  } */
 
   /* Deleted New One */
-
+  /* 
   for (let i = 0; i < AllocationList.length; i++) {
     if (AllocationPersons.indexOf(AllocationList[i].ALLOCATED) === -1) {
       AllocationList.splice(i, 1)
     }
-  }
+  } */
 
   res.status(200).json({
     success: true,
@@ -54,10 +54,10 @@ exports.NewCaseForm = async (req, res) => {
   const FileSelectionquery = `SELECT*FROM FILETABLES WHERE esarkar=?`
   const datequery = `SELECT*FROM FILETABLES WHERE YEAR(DATE_TIME)=?`
   const FiletableEntryQuery = `INSERT INTO FILETABLES (FILENO,eSarkar,DEPARTMENT,SUB,FTYPE,STAGE,ALLOT,USER,DATE_TIME,UO,DEADLINE,Attachment) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`
+  const QueryForAllocationRatio = `SELECT RATIO FROM ALLOCATION WHERE ALLOCATED=?`
 
-  const UpdateCount = `UPDATE ALLOCATION SET COUNT=COUNT+1 WHERE ALLOCATED=?`
-  const CheckAllotment = `SELECT*FROM ALLOCATION WHERE ALLOCATED=?`
-  const InsertInAllotment = `INSERT INTO ALLOCATION (ALLOCATED,COUNT) VALUES(?,0)`
+  /*   const CheckAllotment = `SELECT*FROM ALLOCATION WHERE ALLOCATED=?`
+  const InsertInAllotment = `INSERT INTO ALLOCATION (ALLOCATED,COUNT) VALUES(?,0)` */
   let {
     fileno,
     esarkarno,
@@ -73,7 +73,9 @@ exports.NewCaseForm = async (req, res) => {
     Other,
   } = req.body
 
-  if (Allotment) {
+  const ratio = await connection.query(QueryForAllocationRatio, [Allotment])
+
+  /*   if (Allotment) {
     const AllocationResponse = await connection.query(CheckAllotment, [
       Allotment,
     ])
@@ -87,7 +89,7 @@ exports.NewCaseForm = async (req, res) => {
         })
       }
     }
-  }
+  } */
 
   if (date.length === 0) {
     let dt = new Date()
@@ -104,7 +106,10 @@ exports.NewCaseForm = async (req, res) => {
 
   const UO = `${result[0].length + 1}/${dates.getFullYear()}`
 
-  const AllocationCount = await connection.query(UpdateCount, [Allotment])
+  const AllocationCount = await connection.query(
+    `UPDATE ALLOCATION SET COUNT=COUNT+"${ratio[0][0].RATIO}" WHERE ALLOCATED=?`,
+    [Allotment],
+  )
 
   const Fileresult = await connection.query(FileSelectionquery, [esarkarno])
 
