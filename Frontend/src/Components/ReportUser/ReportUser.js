@@ -147,7 +147,7 @@ function ReportUser() {
                                   return (
                                     <>
                                       <li>{accused}</li>
-                                      ----------
+                                      <p>----------</p>
                                     </>
                                   )
                                 })}

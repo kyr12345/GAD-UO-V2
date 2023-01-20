@@ -10,8 +10,10 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import ipfile from '../../ip.json'
 import Paper from '@mui/material/Paper'
+/* 
+import { Button } from '@material-ui/core' */
 import { Button } from '@mui/material'
-
+import * as XLSX from 'xlsx'
 function CaseStageReports() {
   const url = `http://${ipfile.ip}:3000/api/v1/CaseStageReports`
   const [fromdate, setfromdate] = useState('')
@@ -45,6 +47,30 @@ function CaseStageReports() {
       border: 0,
     },
   }))
+
+  const handleDownload = () => {
+    const printingResponse = []
+
+    for (let i = 0; i < reports.length; i++) {
+      let eachAllotment = {}
+
+      eachAllotment['Designation'] = reports[i].Allot
+
+      for (let j = 0; j < reports[i].stages.length; j++) {
+        console.log(reports[i].stages[j].stage)
+        const allotment = reports[i].stages[j].stage
+        eachAllotment[allotment] = reports[i].stages[j].count
+      }
+
+      printingResponse.push(eachAllotment)
+    }
+    const worksheets = XLSX.utils.json_to_sheet(printingResponse)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheets, 'Reports')
+
+    XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' })
+    XLSX.writeFile(workbook, `Reports.xlsx`)
+  }
 
   const handleDateSearch = async (e) => {
     e.preventDefault()
@@ -184,61 +210,24 @@ function CaseStageReports() {
                         {report.stages.map((everystage) => (
                           <StyledTableCell>{everystage.count}</StyledTableCell>
                         ))}
-
-                        {/*    <StyledTableCell align="center">
-                          {report.stages[0].count}
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {report.stages[1].count}
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {report.stages[1].count}
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {report.stages[2].count}
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {report.stages[3].count}
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {report.stages[4].count}
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {report.stages[5].count}
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {report.stages[6].count}
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {report.stages[7].count}
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {report.stages[8].count}
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {report.stages[9].count}
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {report.stages[10].count}
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {report.stages[11].count}
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {report.stages[12].count}
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {report.stages[13].count}
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {report.stages[14].count}
-                        </StyledTableCell> */}
                       </StyledTableRow>
                     )
                   })}
               </TableBody>
             </Table>
           </TableContainer>
+          <div className="flex justify-center w-full py-8">
+            <Button
+              onClick={handleDownload}
+              variant="contained"
+              style={{
+                backgroundColor: '#1d6f42 ',
+                color: 'white',
+              }}
+            >
+              Export Excel
+            </Button>
+          </div>
         </div>
       )}
     </div>
