@@ -59,6 +59,16 @@ function InwardNew() {
     }
   }
   useEffect(() => {
+    let userdata = JSON.parse(window.localStorage.getItem('ROLE_NAME'))
+    if (userdata.length == '0' || userdata.username.length === 0) {
+      navigate('/')
+    }
+  }, [])
+  useEffect(() => {
+    let userdata = JSON.parse(window.localStorage.getItem('ROLE_NAME'))
+    if (userdata.length == '0' || userdata.username.length === 0) {
+      navigate('/')
+    }
     if (result) {
       setuser(result.username)
       fetchAllocation()

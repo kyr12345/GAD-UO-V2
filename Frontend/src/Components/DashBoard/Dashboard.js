@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux'
 import ReportUser from '../ReportUser/ReportUser'
 import CaseStageReports from '../CaseStageReports/CaseStageReports'
 import AdminReports from '../AdminReports/AdminReports'
+import PasswordChange from '../PasswordChange/PasswordChange'
 function Dashboard() {
   const dispatch = useDispatch()
   const { newform } = useParams()
@@ -24,7 +25,8 @@ function Dashboard() {
 
   useEffect(() => {
     let userdata = JSON.parse(window.localStorage.getItem('ROLE_NAME'))
-    if (userdata.username.length === 0) {
+    console.log(userdata)
+    if (userdata.length == '0' || userdata.username.length === 0) {
       navigate('/')
     }
   }, [])
@@ -91,6 +93,11 @@ function Dashboard() {
         {newform && newform === 'caseStageReports' && (
           <>
             <CaseStageReports />
+          </>
+        )}
+        {newform && newform === 'changepassword' && (
+          <>
+            <PasswordChange />
           </>
         )}
       </div>

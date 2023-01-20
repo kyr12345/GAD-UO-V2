@@ -92,3 +92,23 @@ exports.Register = async (req, res) => {
     })
   }
 }
+
+exports.ChangePassword = async (req, res) => {
+  const { changePassword, user } = req.body
+
+  const query = `UPDATE USERS SET password=? where username=?`
+  const hashpass = await bcrypt.hashSync(changePassword, 10)
+  const data = await connection.query(query, [changePassword, user])
+  console.log(data[0])
+  if (data[0].affectedRows == '1') {
+    res.status(200).json({
+      success: true,
+      msg: 'Password Updated Successfully',
+    })
+  } else {
+    res.status(200).json({
+      success: false,
+      msg: 'Password Not Updated',
+    })
+  }
+}
