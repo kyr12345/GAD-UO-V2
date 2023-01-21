@@ -267,7 +267,7 @@ function InwardOld({
                 }}
                 value={esarkar}
                 className="w-full bg-white"
-                placeholder="Enter The UO Number"
+                placeholder="Enter The eSarkar Number"
               />
             </div>
           </>
