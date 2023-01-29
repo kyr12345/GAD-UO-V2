@@ -1,5 +1,5 @@
 {
-  "name": "e-commerce-mern",
+  "name": "Backend.js",
   "version": "1.0.0",
   "description": "",
   "main": "backend/Server.js",
@@ -8,6 +8,7 @@
     "server": "nodemon backend.js",
     "client": "cd ../frontend && npm start",
     "dev": "start npm run client && start npm run server"
+
   },
   "author": "",
   "license": "ISC",

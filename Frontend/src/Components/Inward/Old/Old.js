@@ -47,11 +47,12 @@ function InwardOld({
 
     let input = {}
 
-    if (esarkarno.length === 0) {
+    if (esarkar.length === 0) {
       input = {
         search: UO.trim(),
         state: 1,
       }
+      console.log(UO)
     } else {
       input = {
         search: esarkar.trim(),
@@ -267,7 +268,7 @@ function InwardOld({
                 }}
                 value={esarkar}
                 className="w-full bg-white"
-                placeholder="Enter The UO Number"
+                placeholder="Enter The eSarkar Number"
               />
             </div>
           </>

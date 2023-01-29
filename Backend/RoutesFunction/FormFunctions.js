@@ -52,7 +52,10 @@ exports.NewCaseForm = async (req, res) => {
   } = req.body
 
   const ratio = await connection.query(QueryForAllocationRatio, [Allotment])
-
+  const AllocationCount = await connection.query(
+    `UPDATE ALLOCATION SET COUNT=COUNT+"${ratio[0][0].RATIO}" WHERE ALLOCATED=?`,
+    [Allotment],
+  )
   if (date.length === 0) {
     let dt = new Date()
     const newDate = new Date(dt.setFullYear(9999))
@@ -67,11 +70,6 @@ exports.NewCaseForm = async (req, res) => {
   const result = await connection.query(datequery, [dates.getFullYear()])
 
   const UO = `${result[0].length + 1}/${dates.getFullYear()}`
-
-  const AllocationCount = await connection.query(
-    `UPDATE ALLOCATION SET COUNT=COUNT+"${ratio[0][0].RATIO}" WHERE ALLOCATED=?`,
-    [Allotment],
-  )
 
   const Fileresult = await connection.query(FileSelectionquery, [esarkarno])
 
@@ -208,57 +206,94 @@ exports.OldForm = async (req, res) => {
   const search = req.body.search
 
   let EntryFromUoTable
-  if (state == 1) {
+  if (state == '1') {
     EntryFromUoTable = await connection.query(
       `SELECT*FROM FILETABLES WHERE  UO="${search}"`,
     )
-  } else {
-    EntryFromUoTable = await connection.query(
-      `SELECT*FROM FILETABLES WHERE  esarkar REGEXP "${search}"`,
-    )
-  }
 
-  if (EntryFromUoTable[0].length == '1') {
-    const FileEntryDetails = EntryFromUoTable[0][0]
-    const FID = EntryFromUoTable[0][0].FID
+    if (EntryFromUoTable[0].length === 1) {
+      const FileEntryDetails = EntryFromUoTable[0][0]
+      const FID = EntryFromUoTable[0][0].FID
 
-    const query = `SELECT*FROM ACCUSED_DESIGNATION INNER JOIN ACCUSED ON ACCUSED_DESIGNATION.AID=ACCUSED.AID WHERE ACCUSED_DESIGNATION.FID=?`
+      const query = `SELECT*FROM ACCUSED_DESIGNATION INNER JOIN ACCUSED ON ACCUSED_DESIGNATION.AID=ACCUSED.AID WHERE ACCUSED_DESIGNATION.FID=?`
 
-    const AccusedEntry = await connection.query(query, [FID])
-    const AccusedDetails = AccusedEntry[0]
+      const AccusedEntry = await connection.query(query, [FID])
+      const AccusedDetails = AccusedEntry[0]
 
-    const Alldata = {}
-    if (AccusedDetails.length > 0) {
-      Alldata.FileDetails = FileEntryDetails
-      Alldata.Accused_Details = AccusedDetails
-      res.status(200).json({
-        success: true,
-        msg: 'The UO is Found',
-        Data: Alldata,
-      })
-    } else {
-      Alldata.FileDetails = FileEntryDetails
+      const Alldata = {}
+      if (AccusedDetails.length > 0) {
+        Alldata.FileDetails = FileEntryDetails
+        Alldata.Accused_Details = AccusedDetails
+        res.status(200).json({
+          success: true,
+          msg: 'The UO is Found',
+          Data: Alldata,
+        })
+      } else {
+        Alldata.FileDetails = FileEntryDetails
+        res.status(200).json({
+          success: false,
+          msg: 'Data Found Click One more Time',
+          Data: Alldata,
+        })
+      }
+    } else if (state == '1' && EntryFromUoTable[0].length == 0) {
       res.status(200).json({
         success: false,
-        msg: 'Data Found Click One more Time',
-        Data: Alldata,
+        msg: 'File With UO Does Not Exists',
       })
     }
-  } else if (EntryFromUoTable[0].length > 1 && state == '2') {
-    res.status(200).json({
-      success: false,
-      msg: 'Enter Complete eSarkar',
-    })
-  } else if (state == '1' && EntryFromUoTable[0].length == 0) {
-    res.status(200).json({
-      success: false,
-      msg: 'File With UO Does Not Exists',
-    })
-  } else if (state == '2' && EntryFromUoTable[0].length == 0) {
-    res.status(200).json({
-      success: false,
-      msg: 'File With eSarkar Does Not Exists',
-    })
+  } else if (state == '2') {
+    EntryFromUoTable = await connection.query(
+      `SELECT*FROM FILETABLES WHERE  esarkar REGEXP "${search}" ORDER BY UO DESC`,
+    )
+    let ans = []
+    for (let i = 0; i < EntryFromUoTable[0].length; i++) {
+      if (EntryFromUoTable[0][i].eSarkar === search)
+        ans.push(EntryFromUoTable[0][i])
+    }
+
+    if (ans.length > 0) {
+      const FileEntryDetails = ans[0]
+      const FID = ans[0].FID
+
+      const query = `SELECT*FROM ACCUSED_DESIGNATION INNER JOIN ACCUSED ON ACCUSED_DESIGNATION.AID=ACCUSED.AID WHERE ACCUSED_DESIGNATION.FID=?`
+
+      const AccusedEntry = await connection.query(query, [FID])
+      const AccusedDetails = AccusedEntry[0]
+
+      const Alldata = {}
+      if (AccusedDetails.length > 0) {
+        Alldata.FileDetails = FileEntryDetails
+        Alldata.Accused_Details = AccusedDetails
+        res.status(200).json({
+          success: true,
+          msg: 'The UO is Found',
+          Data: Alldata,
+        })
+      } else {
+        Alldata.FileDetails = FileEntryDetails
+        res.status(200).json({
+          success: false,
+          msg: 'Data Found Click One more Time',
+          Data: Alldata,
+        })
+      }
+    } else if (
+      EntryFromUoTable[0].length >= 1 &&
+      state == '2' &&
+      ans.length === 0
+    ) {
+      res.status(200).json({
+        success: false,
+        msg: 'Enter Complete eSarkar',
+      })
+    } else if (state == '2' && EntryFromUoTable[0].length == 0) {
+      res.status(200).json({
+        success: false,
+        msg: 'File With eSarkar Does Not Exists',
+      })
+    }
   }
 }
 
@@ -266,6 +301,7 @@ exports.UpdateForm = async (req, res) => {
   const dates = new Date()
   const datequery = `SELECT*FROM FILETABLES WHERE YEAR(DATE_TIME)=?`
   const EntryFromFiletableQuery = `SELECT*FROM FILETABLES WHERE FID=?`
+  const QueryForAllocationRatio = `SELECT RATIO FROM ALLOCATION WHERE ALLOCATED=?`
   const InsertFileTableQuery = `INSERT INTO FILETABLES (FILENO,eSarkar,Department,Sub,Ftype,Stage,Allot,DATE_TIME, user,UO,DEADLINE,Attachment) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`
   const result = await connection.query(datequery, [dates.getFullYear()])
 
@@ -284,7 +320,7 @@ exports.UpdateForm = async (req, res) => {
     fields,
     Attachment,
   } = req.body
-  if (CaseStage === 'Other') CaseStage = Other
+  if (CaseStage == 'Other') CaseStage = Other
 
   if (date.length == 0) {
     let dt = new Date()
@@ -313,6 +349,12 @@ exports.UpdateForm = async (req, res) => {
   if (InsertResult[0].insertId) {
     /* FID */
     insertid = InsertResult[0].insertId
+
+    const ratio = await connection.query(QueryForAllocationRatio, [Allotment])
+    const AllocationCount = await connection.query(
+      `UPDATE ALLOCATION SET COUNT=COUNT+"${ratio[0][0].RATIO}" WHERE ALLOCATED=?`,
+      [Allotment],
+    )
 
     if (fields.length > 0) {
       fields.map(async (accused) => {
@@ -477,8 +519,7 @@ exports.UpdateForm = async (req, res) => {
 
 exports.Movement = async (req, res) => {
   const { search, state } = req.body
-  console.log(state)
-  console.log(search)
+
   const response = []
 
   const FindOnUO = `SELECT*FROM MOVEMENTS WHERE UO=?`
@@ -518,10 +559,16 @@ exports.Movement = async (req, res) => {
       })
     }
   } else {
-    const FindFromFileQuery = `SELECT*FROM FILETABLES  WHERE (eSarkar REGEXP "${search}") `
+    const FindFromFileQuery = `SELECT*FROM FILETABLES  WHERE (eSarkar REGEXP "${search}") ORDER BY UO DESC`
     const data = await connection.query(FindFromFileQuery)
-    console.log(data[0])
-    if (data[0].length > 1) {
+
+    let ans = []
+
+    for (let i = 0; i < data[0].length; i++) {
+      if (data[0][i].eSarkar === search) ans.push(data[0][i])
+    }
+
+    if (data[0].length >= 1 && ans.length === 0) {
       res.status(200).json({
         success: false,
         msg: 'Enter Full eSarkarno',
@@ -532,14 +579,11 @@ exports.Movement = async (req, res) => {
         msg: 'File With Such eSarkarno Does Not Exists',
       })
     } else {
-      const EntryFromMovement = await connection.query(FindOnUO, [
-        data[0][0].UO,
-      ])
+      const EntryFromMovement = await connection.query(FindOnUO, [ans[0].UO])
       const entryfromFiletables = await connection.query(
         `SELECT*FROM FILETABLES WHERE UO=?`,
-        [data[0][0].UO],
+        [ans[0].UO],
       )
-      console.log(entryfromFiletables[0])
 
       if (EntryFromMovement[0].length > 0) {
         for (let i = 0; i < EntryFromMovement[0].length; i++) {
@@ -878,7 +922,7 @@ exports.GetWorkSheetOnDesignation = async (req, res) => {
   /* MOVEMENTS ON DESIGNATION */
   const QueryForWorkSheet = `SELECT*FROM MOVEMENTS WHERE MOVTO=? ORDER BY CONFIRMATION `
   const data = await connection.query(QueryForWorkSheet, [designation])
-  console.log(data[0])
+
   /* details of each UO */
   if (data[0].length > 0) {
     const queryForData = `SELECT* FROM FILETABLES INNER JOIN ACCUSED_DESIGNATION INNER JOIN ACCUSED ON ACCUSED_DESIGNATION.AID=ACCUSED.AID ON FILETABLES.FID=ACCUSED_DESIGNATION.FID WHERE FILETABLES.UO=? `
@@ -903,7 +947,7 @@ exports.GetWorkSheetOnDesignation = async (req, res) => {
       }
 
       const datas = await connection.query(queryForData, [data[0][i].UO])
-      console.log(datas[0])
+
       for (let j = 0; j < datas[0].length; j++) {
         accused.push(datas[0][j].NAME)
       }
@@ -938,7 +982,7 @@ exports.GetWorkSheetOnDesignation = async (req, res) => {
 exports.UsersAllocation = async (req, res) => {
   const QueryForUsers = `SELECT*FROM ALLOCATION`
   const data = await connection.query(QueryForUsers)
-  console.log(data[0])
+
   res.status(200).json({
     data: data[0],
   })
