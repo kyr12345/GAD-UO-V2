@@ -800,7 +800,7 @@ exports.GetFileOnDesignation = async (req, res) => {
   const responseMovements = await connection.query(QueryForMovement, [
     designation,
   ])
-
+  console.log(responseMovements[0])
   /* ------------------ */
 
   //CurrentMonth Case Allocation and Submission
@@ -836,13 +836,33 @@ exports.GetFileOnDesignation = async (req, res) => {
     [designation, firstDayCurrentMonth, lastDayCurrentMonth],
   )
 
+  const AllListsFromDesignation = await connection.query(
+    `SELECT*FROM MOVEMENTS WHERE MOVTO=?`,
+    [designation],
+  )
+  let CurrentMonthSubmitted = 0
+  for (let i = 0; i < AllListsFromDesignation[0].length; i++) {
+    const UserData = await connection.query(
+      `SELECT*FROM MOVEMENTS WHERE UO=?`,
+      [AllListsFromDesignation[0][i].UO],
+    )
 
-  
-  console.log(valueofCurrentMonthSubmitted[0])
+    for (let j = 0; j < UserData[0].length; j++) {
+      if (
+        UserData[0][j].MOVTO == designation &&
+        UserData[0][j].CONFIRMATION == 'YES' &&
+        UserData[0][j + 1].date_time >= firstDayCurrentMonth &&
+        UserData[0][j + 1].date_time <= lastDayCurrentMonth
+      ) {
+        CurrentMonthSubmitted++
+      }
+    }
+  }
+
   const valueofAllPending = await connection.query(QueryForAllPendingCases, [
     designation,
   ])
-  console.log(valueofAllPending[0])
+
   const valueofPreviousMonthPending = await connection.query(
     QueryForAllPreviousMonthPendingCases,
     [designation, prevMonthFirstDate, prevMonthLastDate],
@@ -896,6 +916,7 @@ exports.GetFileOnDesignation = async (req, res) => {
       }
       if (data[0].length > 0) {
         deadlineFile.push({
+          AllotedOn: responseMovements[0][i].MOVTDATE + 1,
           uo: data[0][0].UO,
           esarkarno: data[0][0].eSarkar,
           department: data[0][0].Department,
@@ -916,7 +937,7 @@ exports.GetFileOnDesignation = async (req, res) => {
   res.status(200).json({
     response: deadlineFile,
     AllocatedFiles: CurrentMonthCaseAllocation,
-    Submitted: CurrentMonthCaseSubmitted,
+    Submitted: CurrentMonthSubmitted,
     Pending: AllPending,
     PreviousPending: PreviousMonthPending,
   })
