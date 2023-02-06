@@ -113,6 +113,7 @@ function ReportUser() {
                   <StyledTableCell align="center">
                     Submission Date
                   </StyledTableCell>
+                  <StyledTableCell align="center">Alloted On</StyledTableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -170,6 +171,9 @@ function ReportUser() {
                                 <p>Pending</p>
                               </>
                             )}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {file.AllotedOn.slice(4, 15)}
                           </StyledTableCell>
                         </StyledTableRow>
                       )

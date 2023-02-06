@@ -810,15 +810,17 @@ exports.GetFileOnDesignation = async (req, res) => {
 
   let lastDayCurrentMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0)
 
-  let prevMonthLastDate = new Date(date.getFullYear(), date.getMonth(), 0)
   let prevMonthFirstDate = new Date(
     date.getFullYear() - (date.getMonth() > 0 ? 0 : 1),
     (date.getMonth() - 1 + 12) % 12,
     1,
   )
+
+  let prevMonthLastDate = new Date(date.getFullYear(), date.getMonth(), 0)
+
   /* AND CONFIRMATION="NO" */
   const QueryForCurrentMonthCasesAllocated = `SELECT * FROM MOVEMENTS  WHERE MOVTO=?  AND MOVTDATE>=? AND MOVTDATE<=?`
-  const QueryForCurrentMonthCasesSubmitted = `SELECT * FROM MOVEMENTS  WHERE MOVTO=? AND CONFIRMATION="YES" AND MOVTDATE>=? AND MOVTDATE<=?`
+  const QueryForCurrentMonthCasesSubmitted = `SELECT * FROM MOVEMENTS  WHERE MOVTO=? AND CONFIRMATION="YES" AND date_time>=? AND date_time<=?`
 
   const QueryForAllPendingCases = `SELECT * FROM MOVEMENTS  WHERE MOVTO=? AND CONFIRMATION="NO"`
 
@@ -828,14 +830,19 @@ exports.GetFileOnDesignation = async (req, res) => {
     QueryForCurrentMonthCasesAllocated,
     [designation, firstDayCurrentMonth, lastDayCurrentMonth],
   )
+
   const valueofCurrentMonthSubmitted = await connection.query(
     QueryForCurrentMonthCasesSubmitted,
     [designation, firstDayCurrentMonth, lastDayCurrentMonth],
   )
+
+
+  
+  console.log(valueofCurrentMonthSubmitted[0])
   const valueofAllPending = await connection.query(QueryForAllPendingCases, [
     designation,
   ])
-
+  console.log(valueofAllPending[0])
   const valueofPreviousMonthPending = await connection.query(
     QueryForAllPreviousMonthPendingCases,
     [designation, prevMonthFirstDate, prevMonthLastDate],
@@ -955,6 +962,7 @@ exports.GetWorkSheetOnDesignation = async (req, res) => {
       if (datas[0].length > 0) {
         Response.push({
           uo: datas[0][0].UO,
+          AllotedOn: data[0][i].MOVTDATE + 1,
           esarkarno: datas[0][0].eSarkar,
           department: datas[0][0].Department,
           fileno: datas[0][0].fileno,
