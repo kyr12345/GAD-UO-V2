@@ -122,7 +122,7 @@ exports.NewCaseForm = async (req, res) => {
             ],
           )
         } else {
-          const Accused_DEntry = await connection.query(
+          const Accused_DEntry = await connection.q11uery(
             Accused_Designation_Entry,
             [
               accused.DESIGNATION,
@@ -902,10 +902,12 @@ exports.GetFileOnDesignation = async (req, res) => {
 
   /* details of each FILE MOVEMENT */
   if (responseMovements[0].length > 0) {
+
+
     const queryForData = `SELECT* FROM FILETABLES INNER JOIN ACCUSED_DESIGNATION INNER JOIN ACCUSED ON ACCUSED_DESIGNATION.AID=ACCUSED.AID ON FILETABLES.FID=ACCUSED_DESIGNATION.FID WHERE FILETABLES.UO=? `
 
     let accused = []
-
+const data=10
     for (let i = 0; i < responseMovements[0].length; i++) {
       const data = await connection.query(queryForData, [
         responseMovements[0][i].UO,
